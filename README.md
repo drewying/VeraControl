@@ -9,14 +9,16 @@ Still a very early work in progress.
 Usage:
 
 Discovery:
+```
 VeraController *veraController = [VeraController sharedInstance];
 [veraController refreshDevices];
-
 ZwaveSwitch *bedroomSwitch = [veraController.switches objectAtIndex:0];
+```
 
 Turn on a lightswitch:
+```
 [veraController setZwaveSwitch:bedroomSwitch toState:YES completion:^(){}];
-
+```
 TODO:
 Seperate VeraController into multiple sub-controller classes
 Zwave Sensors control and alerts
