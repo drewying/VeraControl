@@ -8,6 +8,6 @@
 
 #import "ZWaveNode.h"
 
-@interface ZWaveHumiditySensor : ZWaveNode
+@interface ZwaveHumiditySensor : ZwaveNode
 @property (nonatomic, assign) NSInteger humidity;
 @end

@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 PeopleTech. All rights reserved.
 //
 
-#import "ZWaveHumiditySensor.h"
+#import "ZwaveHumiditySensor.h"
 
-@implementation ZWaveHumiditySensor
+@implementation ZwaveHumiditySensor
 
 @end

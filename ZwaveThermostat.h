@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 PeopleTech. All rights reserved.
 //
 
-#import "ZWaveNode.h"
+#import "ZwaveNode.h"
 
 #define FAN_MODE_AUTO @"Auto"
 #define FAN_MODE_ON @"ContinuousOn"
@@ -16,7 +16,7 @@
 #define THERMO_MODE_COOL @"CoolOn"
 #define THERMO_MODE_HEAT @"HeatOn"
 
-@interface ZWaveThermostat : ZWaveNode
+@interface ZwaveThermostat : ZwaveNode
 @property (nonatomic, strong) NSString *fanMode;
 @property (nonatomic, strong) NSString *thermoMode;
 @property (nonatomic, assign) NSInteger temperature;

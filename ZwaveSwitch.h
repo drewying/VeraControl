@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ZWaveNode.h"
 
-@interface ZwaveSwitch : ZWaveNode
+@interface ZwaveSwitch : ZwaveNode
 @property (nonatomic, assign) BOOL state;
 
 @end

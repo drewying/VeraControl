@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ZWaveNode : NSObject
+@interface ZwaveNode : NSObject
 @property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, strong) NSString *name;
 @end

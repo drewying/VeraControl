@@ -81,19 +81,19 @@ static VeraController *sharedInstance;
     [self performAction:[NSString stringWithFormat:@"SetTarget&newTargetValue=%i",(locked == YES)] onDevice:lock.identifier usingService:SERVICE_LOCK completion:callback];
 }
 
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toHeat:(NSInteger)heat completion:(void(^)())callback{
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toHeat:(NSInteger)heat completion:(void(^)())callback{
     [self performAction:[NSString stringWithFormat:@"SetCurrentSetpoint&NewCurrentSetpoint=%i", heat] onDevice:thermostat.identifier usingService:SERVICE_HEAT completion:callback];
 }
 
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toCool:(NSInteger)cool completion:(void(^)())callback{
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toCool:(NSInteger)cool completion:(void(^)())callback{
     [self performAction:[NSString stringWithFormat:@"SetCurrentSetpoint&NewCurrentSetpoint=%i", cool] onDevice:thermostat.identifier usingService:SERVICE_COOL completion:callback];
 }
 
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toFanMode:(NSString*)fan completion:(void(^)())callback{
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toFanMode:(NSString*)fan completion:(void(^)())callback{
     [self performAction:[NSString stringWithFormat:@"SetMode&NewMode=%@", fan] onDevice:thermostat.identifier usingService:SERVICE_HVAC_FAN completion:callback];
 }
 
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toThermoMode:(NSString*)thermo completion:(void(^)())callback{
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toThermoMode:(NSString*)thermo completion:(void(^)())callback{
     [self performAction:[NSString stringWithFormat:@"SetModeTarget&NewModeTarget=%@", thermo] onDevice:thermostat.identifier usingService:SERVICE_HVAC_THERMO completion:callback];
 }
 
@@ -168,7 +168,7 @@ static VeraController *sharedInstance;
             self.sensors = [sensors copy];
             
             NSDictionary *thermoDictionary = [[results objectForKey:@"Thermostat"] objectAtIndex:0];
-            ZWaveThermostat *thermo = [[ZWaveThermostat alloc] init];
+            ZwaveThermostat *thermo = [[ZwaveThermostat alloc] init];
             thermo.name = [thermoDictionary objectForKey:@"name"];
             thermo.identifier = [thermoDictionary objectForKey:@"id"];
             thermo.heatTermperatureSet = [[thermoDictionary objectForKey:@"heatsp"] integerValue];
@@ -180,7 +180,7 @@ static VeraController *sharedInstance;
             self.mainThermostat = thermo;
             
             NSDictionary *humidDictionary = [[results objectForKey:@"Humidity Sensor"] objectAtIndex:0];
-            ZWaveHumiditySensor *sensor = [[ZWaveHumiditySensor alloc] init];
+            ZwaveHumiditySensor *sensor = [[ZwaveHumiditySensor alloc] init];
             sensor.name = [humidDictionary objectForKey:@"name"];
             sensor.identifier = [humidDictionary objectForKey:@"id"];
             sensor.humidity = [[humidDictionary objectForKey:@"humidity"] integerValue];

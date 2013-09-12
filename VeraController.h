@@ -9,8 +9,8 @@
 @class ZwaveSwitch;
 @class ZwaveDimmerSwitch;
 @class ZwaveLock;
-@class ZWaveHumiditySensor;
-@class ZWaveThermostat;
+@class ZwaveHumiditySensor;
+@class ZwaveThermostat;
 
 #import <Foundation/Foundation.h>
 
@@ -26,8 +26,8 @@
 @property (nonatomic, strong) NSArray *dimmerSwitches;
 @property (nonatomic, strong) NSArray *sensors;
 @property (nonatomic, strong) NSString *ipAddress;
-@property (nonatomic, strong) ZWaveThermostat *mainThermostat;
-@property (nonatomic, strong) ZWaveHumiditySensor *mainHumiditySensor;
+@property (nonatomic, strong) ZwaveThermostat *mainThermostat;
+@property (nonatomic, strong) ZwaveHumiditySensor *mainHumiditySensor;
 
 //Lights/Switches
 -(void)setZwaveSwitch:(ZwaveSwitch*)zSwitch toState:(BOOL)state completion:(void(^)())callback;
@@ -37,10 +37,10 @@
 -(void)setZwaveLock:(ZwaveLock*)lock toLocked:(BOOL)locked completion:(void(^)())callback;
 
 //Climate
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toHeat:(NSInteger)heat completion:(void(^)())callback;
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toCool:(NSInteger)cool completion:(void(^)())callback;
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toFanMode:(NSString*)fan completion:(void(^)())callback;
--(void)setZwaveThermostat:(ZWaveThermostat*)thermostat toThermoMode:(NSString*)thermo completion:(void(^)())callback;
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toHeat:(NSInteger)heat completion:(void(^)())callback;
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toCool:(NSInteger)cool completion:(void(^)())callback;
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toFanMode:(NSString*)fan completion:(void(^)())callback;
+-(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toThermoMode:(NSString*)thermo completion:(void(^)())callback;
 
 //Discovery
 -(void)refreshDevices;

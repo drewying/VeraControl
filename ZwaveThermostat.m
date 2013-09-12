@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 PeopleTech. All rights reserved.
 //
 
-#import "ZWaveNode.h"
+#import "ZWaveThermostat.h"
 
-@implementation ZWaveNode
+@implementation ZwaveThermostat
 
 @end

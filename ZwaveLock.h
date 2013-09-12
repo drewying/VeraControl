@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "ZWaveNode.h"
 
-@interface ZwaveLock : ZWaveNode
+@interface ZwaveLock : ZwaveNode
 @property (nonatomic, assign) BOOL locked;
 @end

@@ -8,7 +8,7 @@
 
 #import "ZWaveNode.h"
 
-@interface ZwaveSensor : ZWaveNode
+@interface ZwaveSensor : ZwaveNode
 @property (nonatomic, assign) BOOL state;
 @property (nonatomic, assign) BOOL tripped;
 @property (nonatomic, assign) NSDate *lastTrip;
