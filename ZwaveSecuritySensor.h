@@ -8,7 +8,9 @@
 
 #import "ZWaveNode.h"
 
-@interface ZwaveSensor : ZwaveNode
+#define UPNP_SERVICE_SENSOR_SECURITY @"urn:micasaverde-com:serviceId:SecuritySensor1"
+
+@interface ZwaveSecuritySensor : ZwaveNode
 @property (nonatomic, assign) BOOL state;
 @property (nonatomic, assign) BOOL tripped;
 @property (nonatomic, assign) NSDate *lastTrip;

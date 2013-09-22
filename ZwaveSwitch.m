@@ -8,14 +8,12 @@
 
 #import "ZwaveSwitch.h"
 
-#define SERVICE @"SwitchPower1"
-
 @implementation ZwaveSwitch
 
 
--(void)setState:(BOOL)state completion:(void(^)())callback{
-    [self performAction:[NSString stringWithFormat:@"SetTarget&newTargetValue=%i",(state == YES)] usingService:SERVICE completion:^(NSURLResponse *response, NSData *data, NSError *error){
-        self.state = state;
+-(void)setOn:(BOOL)on completion:(void(^)())callback{
+    [self performAction:[NSString stringWithFormat:@"SetTarget&newTargetValue=%i",(on == YES)] usingService:UPNP_SERVICE_SWITCH completion:^(NSURLResponse *response, NSData *data, NSError *error){
+        self.on = on;
         if (callback){
             callback();
         }

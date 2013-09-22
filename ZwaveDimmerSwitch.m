@@ -8,12 +8,10 @@
 
 #import "ZwaveDimmerSwitch.h"
 
-#define SERVICE @"Dimming1"
-
 @implementation ZwaveDimmerSwitch
 
 -(void)setBrightness:(NSInteger)brightness completion:(void(^)())callback{
-    [self performAction:[NSString stringWithFormat:@"SetLoadLevelTarget&newLoadlevelTarget=%i",brightness] usingService:SERVICE completion:^(NSURLResponse *response, NSData *data, NSError *error){
+    [self performAction:[NSString stringWithFormat:@"SetLoadLevelTarget&newLoadlevelTarget=%i",brightness] usingService:UPNP_SERVICE_DIMMER completion:^(NSURLResponse *response, NSData *data, NSError *error){
         self.brightness = brightness;
         if (callback){
             callback();
@@ -21,5 +19,8 @@
     }];
 }
 
+-(NSString*)veraDeviceFileName{
+    return @"D_DimmableLight1.json";
+}
 
 @end

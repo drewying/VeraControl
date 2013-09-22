@@ -8,6 +8,10 @@
 
 #import "ZwaveSwitch.h"
 
+#define UPNP_SERVICE_DIMMER @"urn:upnp-org:serviceId:Dimming1"
+
 @interface ZwaveDimmerSwitch : ZwaveSwitch
+
 @property (nonatomic, assign) NSInteger brightness;
+
 @end

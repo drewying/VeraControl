@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 PeopleTech. All rights reserved.
 //
 
-#import "ZwaveSensor.h"
+#import "ZwaveSecuritySensor.h"
 
-@implementation ZwaveSensor
+@implementation ZwaveSecuritySensor
 
 @end

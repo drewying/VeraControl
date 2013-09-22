@@ -13,13 +13,36 @@
 
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
     
-    //NSString *htmlString = [NSString stringWithFormat:@"http://%@:3480/data_request?id=action&output_format=json&DeviceNum=%@&serviceId=urn:upnp-org:serviceId:%@&action=%@", self.controllerIpAddress, self.identifier, service, action];
-    
-    NSString *htmlString = [NSString stringWithFormat:@"http://%@/data_request?id=action&output_format=json&DeviceNum=%@&serviceId=urn:upnp-org:serviceId:%@&action=%@", self.controllerUrl, self.identifier, service, action];
+    NSString *htmlString = [NSString stringWithFormat:@"http://%@/data_request?id=action&output_format=json&DeviceNum=%@&serviceId=%@&action=%@", self.controllerUrl, self.identifier, service, action];
     
     [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         callback(response, data, error);
     }];
+}
+
+-(NSString*)veraDeviceFileName{
+    return @"";
+}
+
+-(void)getDeviceFileInformation:(void(^)(NSDictionary *deviceInfo))callback{
+    NSString *htmlString = [NSString stringWithFormat:@"http://%@/data_request?id=file&parameters=%@", self.controllerUrl, [self veraDeviceFileName]];
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
+        callback(dict);
+    }];
+    
+}
+
+-(void)getDeviceTriggers:(void(^)(NSArray *triggers))callback{
+    
+    [self getDeviceFileInformation:^(NSDictionary *deviceInformation){
+        NSArray *array = @[];
+        for (NSDictionary *dict in [deviceInformation objectForKey:@"eventList2"]){
+            array = [array arrayByAddingObject:dict];
+        }
+        callback(array);
+    }];
+    
 }
 
 @end

@@ -16,6 +16,12 @@
 #define THERMO_MODE_COOL_ONLY @"CoolOn"
 #define THERMO_MODE_HEAT_ONLY @"HeatOn"
 
+#define UPNP_SERVICE_HEAT @"urn:upnp-org:serviceId:TemperatureSetpoint1_Heat"
+#define UPNP_SERVICE_COOL @"urn:upnp-org:serviceId:TemperatureSetpoint1_Cool"
+#define UPNP_SERVICE_HVAC_FAN @"urn:upnp-org:serviceId:HVAC_FanOperatingMode1"
+#define UPNP_SERVICE_HVAC_THERMO @"urn:upnp-org:serviceId:HVAC_UserOperatingMode1"
+#define UPNP_SERVICE_TEMPERATURE_SENSOR @"urn:upnp-org:serviceId:TemperatureSensor1"
+
 @interface ZwaveThermostat : ZwaveNode
 @property (nonatomic, strong) NSString *fanMode;
 @property (nonatomic, strong) NSString *thermoMode;

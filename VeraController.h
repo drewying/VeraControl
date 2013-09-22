@@ -27,14 +27,20 @@
 @property (nonatomic, strong) NSArray *switches;
 @property (nonatomic, strong) NSArray *locks;
 @property (nonatomic, strong) NSArray *dimmerSwitches;
-@property (nonatomic, strong) NSArray *sensors;
+@property (nonatomic, strong) NSArray *securitySensors;
+@property (nonatomic, strong) NSArray *thermostats;
+@property (nonatomic, strong) NSArray *hueBulbs;
+
 @property (nonatomic, strong) NSString *ipAddress;
+@property (nonatomic, strong) NSString *veraSerialNumber;
+@property (nonatomic, strong) NSString *miosUsername;
+@property (nonatomic, strong) NSString *miosPassword;
+
 @property (nonatomic, assign) BOOL useMiosRemoteService;
-@property (nonatomic, strong) ZwaveThermostat *mainThermostat;
-@property (nonatomic, strong) ZwaveHumiditySensor *mainHumiditySensor;
 
 //Discovery
 -(void)refreshDevices;
+-(void)refreshDevicesExtended;
 -(void)startHeartbeat;
 -(void)stopHeartbeat;
 
