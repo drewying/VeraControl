@@ -10,6 +10,9 @@
 #import "ZWaveNode.h"
 
 @interface ZwaveSwitch : ZwaveNode
+
 @property (nonatomic, assign) BOOL state;
+
+-(void)setState:(BOOL)state completion:(void(^)())callback;
 
 @end

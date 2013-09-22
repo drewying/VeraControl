@@ -14,6 +14,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define VERA_DEVICES_DID_REFRESH_NOTIFICATION @"com.peopletech.DevicesDidRefresh"
+
 @protocol VeraControllerDelegate <NSObject>
 @end
 
@@ -21,26 +23,15 @@
 
 +(id)sharedController;
 
+@property (nonatomic, strong) NSArray *rooms;
 @property (nonatomic, strong) NSArray *switches;
 @property (nonatomic, strong) NSArray *locks;
 @property (nonatomic, strong) NSArray *dimmerSwitches;
 @property (nonatomic, strong) NSArray *sensors;
 @property (nonatomic, strong) NSString *ipAddress;
+@property (nonatomic, assign) BOOL useMiosRemoteService;
 @property (nonatomic, strong) ZwaveThermostat *mainThermostat;
 @property (nonatomic, strong) ZwaveHumiditySensor *mainHumiditySensor;
-
-//Lights/Switches
--(void)setZwaveSwitch:(ZwaveSwitch*)zSwitch toState:(BOOL)state completion:(void(^)())callback;
--(void)setZwaveDimmer:(ZwaveDimmerSwitch*)dimmer toBrightnessLevel:(NSInteger)level completion:(void(^)())callback;
-
-//Security
--(void)setZwaveLock:(ZwaveLock*)lock toLocked:(BOOL)locked completion:(void(^)())callback;
-
-//Climate
--(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toHeat:(NSInteger)heat completion:(void(^)())callback;
--(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toCool:(NSInteger)cool completion:(void(^)())callback;
--(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toFanMode:(NSString*)fan completion:(void(^)())callback;
--(void)setZwaveThermostat:(ZwaveThermostat*)thermostat toThermoMode:(NSString*)thermo completion:(void(^)())callback;
 
 //Discovery
 -(void)refreshDevices;

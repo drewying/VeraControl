@@ -10,4 +10,15 @@
 
 @implementation ZwaveLock
 
+#define SERVICE @"DoorLock1"
+
+-(void)setLocked:(BOOL)locked completion:(void(^)())callback{
+    [self performAction:[NSString stringWithFormat:@"SetTarget&newTargetValue=%i",(locked == YES)] usingService:SERVICE completion:^(NSURLResponse *response, NSData *data, NSError *error){
+        if (callback){
+            callback();
+        }
+    }];
+}
+
+
 @end
