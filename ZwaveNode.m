@@ -13,9 +13,9 @@
 
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
     
-    NSString *htmlString = [NSString stringWithFormat:@"http://%@/data_request?id=action&output_format=json&DeviceNum=%@&serviceId=%@&action=%@", self.controllerUrl, self.identifier, service, action];
+    NSString *htmlString = [NSString stringWithFormat:@"%@/data_request?id=action&output_format=json&DeviceNum=%@&serviceId=%@&action=%@", self.controllerUrl, self.identifier, service, action];
     
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         callback(response, data, error);
     }];
 }
@@ -25,8 +25,8 @@
 }
 
 -(void)getDeviceFileInformation:(void(^)(NSDictionary *deviceInfo))callback{
-    NSString *htmlString = [NSString stringWithFormat:@"http://%@/data_request?id=file&parameters=%@", self.controllerUrl, [self veraDeviceFileName]];
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+    NSString *htmlString = [NSString stringWithFormat:@"%@/data_request?id=file&parameters=%@", self.controllerUrl, [self veraDeviceFileName]];
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
         callback(dict);
     }];

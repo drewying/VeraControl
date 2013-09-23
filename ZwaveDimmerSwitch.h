@@ -14,4 +14,7 @@
 
 @property (nonatomic, assign) NSInteger brightness;
 
+
+-(void)setBrightness:(NSInteger)brightness completion:(void(^)())callback;
+
 @end

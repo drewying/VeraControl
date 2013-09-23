@@ -52,15 +52,15 @@ static VeraController *sharedInstance;
 
 -(NSString *)controlUrl{
     if (self.useMiosRemoteService){
-        return [NSString stringWithFormat:@"fwd5.mios.com/%@/%@/%@", self.miosUsername, self.miosPassword, self.veraSerialNumber];
+        return [NSString stringWithFormat:@"http://fwd5.mios.com/%@/%@/%@", self.miosUsername, self.miosPassword, self.veraSerialNumber];
     }
     else{
-        return [NSString stringWithFormat:@"%@:3480", self.ipAddress];
+        return [NSString stringWithFormat:@"http://%@:3480", self.ipAddress];
     }
 }
 
 -(void)performCommand:(NSString*)command completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/data_request?%@",[self controlUrl], command]]] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/data_request?%@",[self controlUrl], command]]] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         callback(response, data, error);
     }];
 }
@@ -379,8 +379,6 @@ static VeraController *sharedInstance;
         
     
         [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
-        
-        //NSLog(@"Rooms:%@", self.rooms);
     }];
 }
 

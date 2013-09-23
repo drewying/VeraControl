@@ -31,5 +31,9 @@
 @property (nonatomic, assign) NSInteger temperatureHeatTarget;
 @property (nonatomic, assign) NSInteger temperatureCoolTarget;
 
+-(void)setTemperatureHeatTarget:(NSInteger)temperatureHeatTarget completion:(void(^)())callback;
+-(void)setTemperatureCoolTarget:(NSInteger)temperatureCoolTarget completion:(void(^)())callback;
+-(void)setFanMode:(NSString *)fanMode completion:(void(^)())callback;
+-(void)setThermoMode:(NSString *)thermoMode completion:(void(^)())callback;
 
 @end

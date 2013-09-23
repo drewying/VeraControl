@@ -16,4 +16,6 @@
 
 @property (nonatomic, assign) BOOL locked;
 
+-(void)setLocked:(BOOL)locked completion:(void(^)())callback;
+    
 @end
