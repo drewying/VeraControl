@@ -14,6 +14,7 @@
 
 #import <Foundation/Foundation.h>
 
+#define VERA_LOCATE_CONTROLLER_NOTIFICATION @"com.peopletech.LocatedController"
 #define VERA_DEVICES_DID_REFRESH_NOTIFICATION @"com.peopletech.DevicesDidRefresh"
 
 @protocol VeraControllerDelegate <NSObject>
@@ -35,10 +36,12 @@
 @property (nonatomic, strong) NSString *veraSerialNumber;
 @property (nonatomic, strong) NSString *miosUsername;
 @property (nonatomic, strong) NSString *miosPassword;
+@property (nonatomic, strong) NSString *forwardServer;
 
 @property (nonatomic, assign) BOOL useMiosRemoteService;
 
 //Discovery
+-(void)locateController;
 -(void)refreshDevices;
 -(void)refreshDevicesExtended;
 -(void)startHeartbeat;

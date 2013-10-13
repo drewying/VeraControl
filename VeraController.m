@@ -24,6 +24,7 @@
 #define UPNP_DEVICE_TYPE_MOTION_SENSOR @"urn:schemas-micasaverde-com:device:MotionSensor:1"
 #define UPNP_DEVICE_TYPE_NEST_THERMOSTAT @"urn:schemas-watou-com:device:HVAC_ZoneThermostat:1"
 #define UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB @"urn:schemas-intvelt-com:device:HueLamp:1"
+#define FORWARD_SERVER_DEFAULT @"fwd5.mios.com"
 
 @interface VeraController()
 @property (nonatomic, strong) NSTimer *heartBeat;
@@ -50,9 +51,21 @@ static VeraController *sharedInstance;
     [self.heartBeat invalidate];
 }
 
+-(NSString *)locateUrl{
+    if (self.miosUsername.length == 0)
+        return [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=user"];
+    
+    return [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=%@", self.miosUsername];
+}
+
 -(NSString *)controlUrl{
-    if (self.useMiosRemoteService){
-        return [NSString stringWithFormat:@"http://fwd5.mios.com/%@/%@/%@", self.miosUsername, self.miosPassword, self.veraSerialNumber];
+    if (self.forwardServer.length == 0)
+        self.forwardServer = FORWARD_SERVER_DEFAULT;
+    
+    if (self.useMiosRemoteService || self.ipAddress.length == 0){
+        if ([self.veraSerialNumber length] == 0)
+            return [NSString stringWithFormat:@"http://%@/%@/%@", self.forwardServer, self.miosUsername, self.miosPassword];
+        return [NSString stringWithFormat:@"http://%@/%@/%@/%@", self.forwardServer, self.miosUsername, self.miosPassword, self.veraSerialNumber];
     }
     else{
         return [NSString stringWithFormat:@"http://%@:3480", self.ipAddress];
@@ -379,6 +392,21 @@ static VeraController *sharedInstance;
         
     
         [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
+    }];
+}
+
+-(void)locateController {
+    NSURL *url = [NSURL URLWithString:[self locateUrl]];
+    
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:url] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+        NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+        NSDictionary *responseDataInner = [[responseDictionary objectForKey:@"units"] objectAtIndex:0];
+        
+        self.ipAddress = [responseDataInner objectForKey:@"ipAddress"];
+        self.veraSerialNumber = [responseDataInner objectForKey:@"serialNumber"];
+        self.forwardServer = [[[responseDataInner objectForKey:@"forwardServers"] objectAtIndex:0] objectForKey:@"hostName"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:nil];
     }];
 }
 
