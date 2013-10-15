@@ -17,7 +17,9 @@ ZwaveSwitch *bedroomSwitch = [veraController.switches objectAtIndex:0];
 
 Turn on a lightswitch:
 ```
-[veraController setZwaveSwitch:bedroomSwitch toState:YES completion:^(){}];
+[bedroomSwitch setOn:YES completion:^(){
+  NSLog(@"Bedroom Light turned on");
+}];
 ```
 TODO:
 
