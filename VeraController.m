@@ -14,9 +14,10 @@
 #import "ZWaveHumiditySensor.h"
 #import "ZwaveSecuritySensor.h"
 #import "ZwavePhillipsHueBulb.h"
+#import "IPCamera.h"
 #import "VeraRoom.h"
 
-#define EXCLUDED_SWITCH_LIST @[@41,@21]
+#define EXCLUDED_SWITCH_LIST @[]
 
 #define UPNP_DEVICE_TYPE_DIMMABLE_SWITCH @"urn:schemas-upnp-org:device:DimmableLight:1"
 #define UPNP_DEVICE_TYPE_DOOR_LOCK @"urn:schemas-micasaverde-com:device:DoorLock:1"
@@ -24,9 +25,11 @@
 #define UPNP_DEVICE_TYPE_MOTION_SENSOR @"urn:schemas-micasaverde-com:device:MotionSensor:1"
 #define UPNP_DEVICE_TYPE_NEST_THERMOSTAT @"urn:schemas-watou-com:device:HVAC_ZoneThermostat:1"
 #define UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB @"urn:schemas-intvelt-com:device:HueLamp:1"
+#define UPNP_DEVICE_TYPE_IP_CAMERA @"urn:schemas-upnp-org:device:DigitalSecurityCamera:2"
 
 @interface VeraController()
 @property (nonatomic, strong) NSTimer *heartBeat;
+
 @end
 
 @implementation VeraController
@@ -35,8 +38,11 @@ static VeraController *sharedInstance;
 
 +(id)sharedController{
     @synchronized(self) {
-        if (sharedInstance == nil)
+        if (sharedInstance == nil){
             sharedInstance = [[self alloc] init];
+            sharedInstance.extendedMode = YES;
+        }
+        
     }
     return sharedInstance;
 }
@@ -50,9 +56,26 @@ static VeraController *sharedInstance;
     [self.heartBeat invalidate];
 }
 
+-(void)findVeraController{
+    NSURL *url =[NSURL URLWithString:[NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=%@",self.miosUsername]];
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:url] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+        NSDictionary *miosLocatorResponse = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
+        NSArray *units = [miosLocatorResponse objectForKey:@"units"];
+        if (units.count > 0){
+            NSDictionary *mainUnit = [units objectAtIndex:0];
+            self.veraSerialNumber = [mainUnit objectForKey:@"serialNumber"];
+            NSString *ipAddress = [mainUnit objectForKey:@"ipAddress"];
+            self.ipAddress = ipAddress;
+            self.miosHostname = [mainUnit objectForKey:@"active_server"];
+            self.useMiosRemoteService = (self.ipAddress.length < 7);
+            [self refreshDevices];
+        }
+    }];
+}
+
 -(NSString *)controlUrl{
     if (self.useMiosRemoteService){
-        return [NSString stringWithFormat:@"http://fwd5.mios.com/%@/%@/%@", self.miosUsername, self.miosPassword, self.veraSerialNumber];
+        return [NSString stringWithFormat:@"http://%@/%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword, self.veraSerialNumber];
     }
     else{
         return [NSString stringWithFormat:@"http://%@:3480", self.ipAddress];
@@ -65,7 +88,17 @@ static VeraController *sharedInstance;
     }];
 }
 
--(void)refreshDevicesExtended{
+-(void)refreshDevices{
+    if (self.extendedMode){
+        [self getDevicesExtended];
+    }
+    else{
+        [self getDevices];
+    }
+}
+
+
+-(void)getDevicesExtended{
     [self performCommand:@"id=user_data" completion:^(NSURLResponse *response, NSData *data, NSError *error){
         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
         if (r.statusCode ==200){
@@ -93,12 +126,13 @@ static VeraController *sharedInstance;
             
             NSArray *devices = [responseDictionary objectForKey:@"devices"];
             
-            self.switches = @[];
-            self.dimmerSwitches = @[];
-            self.locks = @[];
-            self.thermostats = @[];
-            self.securitySensors = @[];
-            self.hueBulbs = @[];
+            NSArray *switches = @[];
+            NSArray *dimmerSwitches = @[];
+            NSArray *locks = @[];
+            NSArray *thermostats = @[];
+            NSArray *securitySensors = @[];
+            NSArray *hueBulbs = @[];
+            NSArray *ipCameras = @[];
             
             for (NSDictionary *deviceDictionary in devices){
                 NSString *deviceType = [deviceDictionary objectForKey:@"device_type"];
@@ -108,7 +142,7 @@ static VeraController *sharedInstance;
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DIMMABLE_SWITCH]){
                     device = [[ZwaveDimmerSwitch alloc] init];
                     ZwaveDimmerSwitch *dSwitch = (ZwaveDimmerSwitch*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"services"]){
+                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
                         NSString *service = [serviceDictionary objectForKey:@"service"];
                         if ([service isEqualToString:UPNP_SERVICE_DIMMER]){
                             dSwitch.brightness = [[serviceDictionary objectForKey:@"value"] integerValue];
@@ -117,41 +151,41 @@ static VeraController *sharedInstance;
                             dSwitch.on = [[serviceDictionary objectForKey:@"value"] integerValue];
                         }
                     }
-                    self.dimmerSwitches = [self.dimmerSwitches arrayByAddingObject:dSwitch];
+                    dimmerSwitches = [dimmerSwitches arrayByAddingObject:dSwitch];
                 }
                 
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_SWITCH]){
                     device = [[ZwaveSwitch alloc] init];
                     ZwaveSwitch *zSwitch = (ZwaveSwitch*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"services"]){
+                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
                         NSString *service = [serviceDictionary objectForKey:@"service"];
                         if ([service isEqualToString:UPNP_SERVICE_SWITCH]){
                             zSwitch.on = [[serviceDictionary objectForKey:@"value"] integerValue];
                         }
                     }
-                    self.switches = [self.switches arrayByAddingObject:zSwitch];
+                    switches = [switches arrayByAddingObject:zSwitch];
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DOOR_LOCK]){
                     device = [[ZwaveLock alloc] init];
                     ZwaveLock *zLock = (ZwaveLock*)device;
                     
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"services"]){
+                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
                         NSString *service = [serviceDictionary objectForKey:@"service"];
                         if ([service isEqualToString:UPNP_SERVICE_DOOR_LOCK]){
                             zLock.locked = [[serviceDictionary objectForKey:@"value"] integerValue];
                         }
                     }
                     
-                    self.locks = [self.locks arrayByAddingObject:zLock];
+                    locks = [locks arrayByAddingObject:zLock];
                     
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_NEST_THERMOSTAT]){
                     device = [[ZwaveThermostat alloc] init];
                     ZwaveThermostat *zThermo = (ZwaveThermostat*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"services"]){
+                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
                         NSString *service = [serviceDictionary objectForKey:@"service"];
                         if ([service isEqualToString:UPNP_SERVICE_TEMPERATURE_SENSOR]){
                             zThermo.temperature = [[serviceDictionary objectForKey:@"value"] integerValue];
@@ -168,7 +202,7 @@ static VeraController *sharedInstance;
                         if ([service isEqualToString:UPNP_SERVICE_HVAC_THERMO]){
                             zThermo.thermoMode = [serviceDictionary objectForKey:@"value"];
                         }
-                        self.thermostats = [self.thermostats arrayByAddingObject:zThermo];
+                        thermostats = [thermostats arrayByAddingObject:zThermo];
                     }
                     
                 }
@@ -176,7 +210,7 @@ static VeraController *sharedInstance;
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_MOTION_SENSOR]){
                     device = [[ZwaveSecuritySensor alloc] init];
                     ZwaveSecuritySensor *zSensor = (ZwaveSecuritySensor*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"services"]){
+                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
                         NSString *service = [serviceDictionary objectForKey:@"service"];
                         if ([service isEqualToString:UPNP_SERVICE_SENSOR_SECURITY]){
                             NSString *variable = [serviceDictionary objectForKey:@"variable"];
@@ -192,13 +226,13 @@ static VeraController *sharedInstance;
                             }
                         }
                     }
-                    self.securitySensors = [self.securitySensors arrayByAddingObject:zSensor];
+                    securitySensors = [securitySensors arrayByAddingObject:zSensor];
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB]){
                     device = [[ZwavePhillipsHueBulb alloc] init];
                     ZwavePhillipsHueBulb *zHue = (ZwavePhillipsHueBulb*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"services"]){
+                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
                         NSString *service = [serviceDictionary objectForKey:@"service"];
                         if ([service isEqualToString:UPNP_SERVICE_PHILLIPS_HUE_BULB]){
                             NSString *variable = [serviceDictionary objectForKey:@"variable"];
@@ -209,38 +243,73 @@ static VeraController *sharedInstance;
                                 zHue.saturation = [[serviceDictionary objectForKey:@"value"] integerValue];
                                 
                             }
-                            if ([variable isEqualToString:@"Temperature"]){
+                            if ([variable isEqualToString:@"ColorTemperature"]){
                                 zHue.temperature = [[serviceDictionary objectForKey:@"value"] integerValue];
                             }
                         }
                     }
-                    self.hueBulbs = [self.hueBulbs arrayByAddingObject:zHue];
+                    hueBulbs = [hueBulbs arrayByAddingObject:zHue];
+                }
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_IP_CAMERA]){
+                    device = [[IPCamera alloc] init];
+                    IPCamera *ipCam = (IPCamera*)device;
+                    ipCam.username = [deviceDictionary objectForKey:@"username"];
+                    ipCam.password = [deviceDictionary objectForKey:@"password"];
+                    ipCam.ipAddress = [deviceDictionary objectForKey:@"ipaddress"];
+                    
+                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
+                        NSString *service = [serviceDictionary objectForKey:@"service"];
+                        if ([service isEqualToString:UPNP_SERVICE_CAMERA]){
+                            NSString *variable = [serviceDictionary objectForKey:@"variable"];
+                            if ([variable isEqualToString:@"URL"]){
+                                ipCam.snapshotUrl = [serviceDictionary objectForKey:@"value"];
+                            }
+                            if ([variable isEqualToString:@"DirectStreamingURL"]){
+                                ipCam.videoUrl = [serviceDictionary objectForKey:@"value"];
+                            }
+                            if ([variable isEqualToString:@"Commands"]){
+                                NSString *commandString = [serviceDictionary objectForKey:@"value"];
+                                if ([commandString hasPrefix:@"camera_up"]){
+                                    ipCam.canPan = YES;
+                                }
+                            }
+                        }
+                    }
+                    ipCameras = [ipCameras arrayByAddingObject:ipCam];
                 }
                 
                 //Add the device to the room
                 if (device){
                     device.identifier = [deviceDictionary objectForKey:@"id"];
                     device.name = [deviceDictionary objectForKey:@"name"];
+                    device.controllerUrl = [self controlUrl];
+                    device.veraDeviceFileName = [[deviceDictionary objectForKey:@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
                     NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", [deviceDictionary objectForKey:@"room"]]];
                     if (array.count == 1){
                         VeraRoom *room = [array objectAtIndex:0];
                         room.devices = [room.devices arrayByAddingObject:device];
                     }
                 }
-                
-               
-                
             }
             
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
-        
+            self.switches = switches;
+            self.dimmerSwitches = dimmerSwitches;
+            self.hueBulbs = hueBulbs;
+            self.securitySensors = securitySensors;
+            self.locks = locks;
+            self.thermostats = thermostats;
+            self.ipCameras = ipCameras;
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
+            });
         }
     }];
         
 }
 
--(void)refreshDevices{
+
+-(void)getDevices{
     [self performCommand:@"id=sdata" completion:^(NSURLResponse *response, NSData *data, NSError *error){
         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
         if (r.statusCode ==200){
@@ -273,6 +342,7 @@ static VeraController *sharedInstance;
                 [results setObject:[filteredArray copy] forKey:[category objectForKey:@"name"]];
             }
             
+            NSLog(@"%@", [results objectForKey:@"Camera"]);
            
             //Add the devices
             NSMutableArray *dimmableLights = [NSMutableArray array];
@@ -355,6 +425,23 @@ static VeraController *sharedInstance;
             }
             self.securitySensors = [sensors copy];
             
+            for (NSDictionary *dictiony in [results objectForKey:@"Camera"]){
+                
+            }
+            
+            
+            NSMutableArray *cameras = [NSMutableArray array];
+            for (NSDictionary *cameraDictionary in [results objectForKey:@"Camera"]){
+                IPCamera *camera = [[IPCamera alloc] init];
+                camera.identifier = [cameraDictionary objectForKey:@"id"];
+                camera.name = [cameraDictionary objectForKey:@"name"];
+                camera.ipAddress = [cameraDictionary objectForKey:@"ip"];
+                camera.videoUrl = [cameraDictionary objectForKey:@"streaming"];
+                camera.snapshotUrl = [cameraDictionary objectForKey:@"url"];
+                
+            }
+            
+            
             NSDictionary *thermoDictionary = [[results objectForKey:@"Thermostat"] objectAtIndex:0];
             ZwaveThermostat *thermo = [[ZwaveThermostat alloc] init];
             thermo.name = [thermoDictionary objectForKey:@"name"];
@@ -377,8 +464,9 @@ static VeraController *sharedInstance;
             //self.mainHumiditySensor = sensor;
         }
         
-    
-        [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
+        dispatch_async(dispatch_get_main_queue(), ^(){
+            [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
+        });
     }];
 }
 
