@@ -10,7 +10,7 @@
 #import "ZWaveNode.h"
 
 
-#define UPNP_SERVICE_DOOR_LOCK @"urn:upnp-org:serviceId:DoorLock1"
+#define UPNP_SERVICE_DOOR_LOCK @"urn:micasaverde-com:serviceId:DoorLock1"
 
 @interface ZwaveLock : ZwaveNode
 

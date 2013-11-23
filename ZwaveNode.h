@@ -12,6 +12,7 @@
 @property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *controllerUrl;
+@property (nonatomic, strong) NSString *veraDeviceFileName;
 
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback;
 

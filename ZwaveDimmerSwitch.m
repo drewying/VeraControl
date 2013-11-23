@@ -19,8 +19,4 @@
     }];
 }
 
--(NSString*)veraDeviceFileName{
-    return @"D_DimmableLight1.json";
-}
-
 @end
