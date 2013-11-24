@@ -317,6 +317,7 @@ static VeraController *sharedInstance;
                 if (device){
                     device.identifier = [deviceDictionary objectForKey:@"id"];
                     device.name = [deviceDictionary objectForKey:@"name"];
+                    device.room = [deviceDictionary objectForKey:@"room"];
                     device.controllerUrl = [self controlUrl];
                     device.veraDeviceFileName = [[deviceDictionary objectForKey:@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
                     NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", [deviceDictionary objectForKey:@"room"]]];
