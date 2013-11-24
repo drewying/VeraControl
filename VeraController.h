@@ -41,12 +41,11 @@
 @property (nonatomic, strong) NSArray *thermostats;
 @property (nonatomic, strong) NSArray *hueBulbs;
 @property (nonatomic, strong) NSArray *ipCameras;
+@property (nonatomic, strong) NSArray *scenes;
 
 //These values will be automatically found by running the findVeraController method. I'm keeping them public for manual override if needed
 @property (nonatomic, strong) NSString *ipAddress;
 @property (nonatomic, strong) NSString *veraSerialNumber;
-
-//@property (nonatomic, strong) NSString *forwardServer; //mine
 
 @property (nonatomic, assign) BOOL useMiosRemoteService;
 @property (nonatomic, strong) NSString *miosHostname;

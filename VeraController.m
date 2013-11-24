@@ -16,6 +16,7 @@
 #import "ZwavePhillipsHueBulb.h"
 #import "IPCamera.h"
 #import "VeraRoom.h"
+#import "VeraSceneTrigger.h"
 
 #define EXCLUDED_SWITCH_LIST @[]
 
@@ -26,6 +27,7 @@
 #define UPNP_DEVICE_TYPE_NEST_THERMOSTAT @"urn:schemas-watou-com:device:HVAC_ZoneThermostat:1"
 #define UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB @"urn:schemas-intvelt-com:device:HueLamp:1"
 #define UPNP_DEVICE_TYPE_IP_CAMERA @"urn:schemas-upnp-org:device:DigitalSecurityCamera:2"
+#define UPNP_DEVICE_TYPE_SCENE @"urn:micasaverde-com:serviceId:HomeAutomationGateway1"
 
 //This is the default forward server
 #define FORWARD_SERVER_DEFAULT @"fwd5.mios.com"
@@ -100,21 +102,6 @@ static VeraController *sharedInstance;
         }
     }];
 }
-
-/*-(void)locateController {
-    NSURL *url = [NSURL URLWithString:[self locateUrl]];
-    
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:url] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
-        NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-        NSDictionary *responseDataInner = [[responseDictionary objectForKey:@"units"] objectAtIndex:0];
-        
-        self.ipAddress = [responseDataInner objectForKey:@"ipAddress"];
-        self.veraSerialNumber = [responseDataInner objectForKey:@"serialNumber"];
-        self.forwardServer = [[[responseDataInner objectForKey:@"forwardServers"] objectAtIndex:0] objectForKey:@"hostName"];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:nil];
-    }];
-}*/
 
 -(void)performCommand:(NSString*)command completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
     [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/data_request?%@",[self controlUrl], command]]] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
@@ -335,6 +322,34 @@ static VeraController *sharedInstance;
             self.locks = locks;
             self.thermostats = thermostats;
             self.ipCameras = ipCameras;
+            
+            //Get the scenens
+            NSArray *sceneArray = [responseDictionary objectForKey:@"scenes"];
+            NSArray *scenes = @[];
+            
+            for (NSDictionary *sceneDictionary in sceneArray) {
+                VeraSceneTrigger *scene = [[VeraSceneTrigger alloc] init];
+                
+                scene.name = [sceneDictionary objectForKey:@"name"];
+                scene.sceneNum = [sceneDictionary objectForKey:@"id"];
+                scene.room = [NSString stringWithFormat:@"%@",[sceneDictionary objectForKey:@"room"]];
+                scene.controllerUrl = [self controlUrl];
+                scenes = [scenes arrayByAddingObject:scene];
+                
+                NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", scene.room]];
+                if (array.count == 1){
+                    VeraRoom *room = [array objectAtIndex:0];
+                    room.scenes = [room.scenes arrayByAddingObject:scene];
+                }
+                
+            }
+            
+            self.scenes = scenes;
+
+            
+            
+            
+            
             dispatch_async(dispatch_get_main_queue(), ^(){
                 [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
             });
