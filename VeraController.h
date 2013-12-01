@@ -33,6 +33,7 @@
 @property (nonatomic, strong) NSString *miosPassword;
 
 //These arrays will be automatically populated by running the refreshDevices or refreshDeviceExtended methods
+
 @property (nonatomic, strong) NSArray *rooms;
 @property (nonatomic, strong) NSArray *scenes;
 @property (nonatomic, strong) NSArray *switches;
@@ -42,6 +43,10 @@
 @property (nonatomic, strong) NSArray *thermostats;
 @property (nonatomic, strong) NSArray *hueBulbs;
 @property (nonatomic, strong) NSArray *ipCameras;
+
+//These dictionaries store the rooms and devices by id so that they can later be referenced.
+@property (nonatomic, strong) NSMutableDictionary *roomsDictionary;
+@property (nonatomic, strong) NSMutableDictionary *deviceDictionary;
 
 //These values will be automatically found by running the findVeraController method. I'm keeping them public for manual override if needed
 @property (nonatomic, strong) NSString *ipAddress;
