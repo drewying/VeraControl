@@ -14,6 +14,9 @@
 
 #import <Foundation/Foundation.h>
 
+
+//This notification is when the controller is located
+#define VERA_LOCATE_CONTROLLER_NOTIFICATION @"com.peopletech.LocatedController"
 //This notification goes out after devices are fully refreshed
 #define VERA_DEVICES_DID_REFRESH_NOTIFICATION @"com.peopletech.DevicesDidRefresh"
 
@@ -38,10 +41,12 @@
 @property (nonatomic, strong) NSArray *thermostats;
 @property (nonatomic, strong) NSArray *hueBulbs;
 @property (nonatomic, strong) NSArray *ipCameras;
+@property (nonatomic, strong) NSArray *scenes;
 
 //These values will be automatically found by running the findVeraController method. I'm keeping them public for manual override if needed
 @property (nonatomic, strong) NSString *ipAddress;
 @property (nonatomic, strong) NSString *veraSerialNumber;
+
 @property (nonatomic, assign) BOOL useMiosRemoteService;
 @property (nonatomic, strong) NSString *miosHostname;
 
@@ -51,6 +56,7 @@
 //The refreshDevice commands polls the device and build a list of all devices. Setting the extendedMode property to YES tells the device to find ALL devices associated with the Vera controller, including non standardized ones such as Hue bulbs.
 
 @property (nonatomic, assign) BOOL extendedMode;
+
 -(void)refreshDevices;
 
 

@@ -11,6 +11,7 @@
 @interface ZwaveNode : NSObject
 @property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) NSString *room;
 @property (nonatomic, strong) NSString *controllerUrl;
 @property (nonatomic, strong) NSString *veraDeviceFileName;
 

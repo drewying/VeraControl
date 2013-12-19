@@ -11,6 +11,13 @@
 @interface VeraSceneTrigger : NSObject
 
 @property (nonatomic, strong) NSString *name;
-@property (nonatomic, strong) NSString *serviceId;
+//@property (nonatomic, strong) NSString *serviceId;
+@property (nonatomic, strong) NSString *sceneNum;
+@property (nonatomic, strong) NSString *room;
+@property (nonatomic, strong) NSString *controllerUrl;
+
+-(void)runSceneCompletion:(void(^)())callback;
+-(void)SceneOffCompletion:(void(^)())callback;
+
 
 @end

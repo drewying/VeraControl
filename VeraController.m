@@ -16,6 +16,7 @@
 #import "ZwavePhillipsHueBulb.h"
 #import "IPCamera.h"
 #import "VeraRoom.h"
+#import "VeraSceneTrigger.h"
 
 #define EXCLUDED_SWITCH_LIST @[]
 
@@ -26,6 +27,10 @@
 #define UPNP_DEVICE_TYPE_NEST_THERMOSTAT @"urn:schemas-watou-com:device:HVAC_ZoneThermostat:1"
 #define UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB @"urn:schemas-intvelt-com:device:HueLamp:1"
 #define UPNP_DEVICE_TYPE_IP_CAMERA @"urn:schemas-upnp-org:device:DigitalSecurityCamera:2"
+#define UPNP_DEVICE_TYPE_SCENE @"urn:micasaverde-com:serviceId:HomeAutomationGateway1"
+
+//This is the default forward server
+#define FORWARD_SERVER_DEFAULT @"fwd5.mios.com"
 
 @interface VeraController()
 @property (nonatomic, strong) NSTimer *heartBeat;
@@ -56,8 +61,31 @@ static VeraController *sharedInstance;
     [self.heartBeat invalidate];
 }
 
+
+-(NSString *)locateUrl{
+    if (self.miosUsername.length == 0)
+        return [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=user"];
+    
+    return [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=%@", self.miosUsername];
+}
+
+-(NSString *)controlUrl{
+    if (self.miosHostname.length == 0)
+        self.miosHostname = FORWARD_SERVER_DEFAULT;
+    
+    if (self.useMiosRemoteService || self.ipAddress.length == 0){
+        if ([self.veraSerialNumber length] == 0)
+            return [NSString stringWithFormat:@"http://%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword];
+        return [NSString stringWithFormat:@"http://%@/%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword, self.veraSerialNumber];
+    }
+    else{
+        return [NSString stringWithFormat:@"http://%@:3480", self.ipAddress];
+    }
+}
+
+
 -(void)findVeraController{
-    NSURL *url =[NSURL URLWithString:[NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=%@",self.miosUsername]];
+    NSURL *url = [NSURL URLWithString:[self locateUrl]];
     [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:url] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         NSDictionary *miosLocatorResponse = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
         NSArray *units = [miosLocatorResponse objectForKey:@"units"];
@@ -68,18 +96,11 @@ static VeraController *sharedInstance;
             self.ipAddress = ipAddress;
             self.miosHostname = [mainUnit objectForKey:@"active_server"];
             self.useMiosRemoteService = (self.ipAddress.length < 7);
-            [self refreshDevices];
+            
+            //[self refreshDevices];
+            [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:nil];
         }
     }];
-}
-
--(NSString *)controlUrl{
-    if (self.useMiosRemoteService){
-        return [NSString stringWithFormat:@"http://%@/%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword, self.veraSerialNumber];
-    }
-    else{
-        return [NSString stringWithFormat:@"http://%@:3480", self.ipAddress];
-    }
 }
 
 -(void)performCommand:(NSString*)command completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
@@ -283,6 +304,7 @@ static VeraController *sharedInstance;
                 if (device){
                     device.identifier = [deviceDictionary objectForKey:@"id"];
                     device.name = [deviceDictionary objectForKey:@"name"];
+                    device.room = [deviceDictionary objectForKey:@"room"];
                     device.controllerUrl = [self controlUrl];
                     device.veraDeviceFileName = [[deviceDictionary objectForKey:@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
                     NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", [deviceDictionary objectForKey:@"room"]]];
@@ -300,6 +322,34 @@ static VeraController *sharedInstance;
             self.locks = locks;
             self.thermostats = thermostats;
             self.ipCameras = ipCameras;
+            
+            //Get the scenens
+            NSArray *sceneArray = [responseDictionary objectForKey:@"scenes"];
+            NSArray *scenes = @[];
+            
+            for (NSDictionary *sceneDictionary in sceneArray) {
+                VeraSceneTrigger *scene = [[VeraSceneTrigger alloc] init];
+                
+                scene.name = [sceneDictionary objectForKey:@"name"];
+                scene.sceneNum = [sceneDictionary objectForKey:@"id"];
+                scene.room = [NSString stringWithFormat:@"%@",[sceneDictionary objectForKey:@"room"]];
+                scene.controllerUrl = [self controlUrl];
+                scenes = [scenes arrayByAddingObject:scene];
+                
+                NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", scene.room]];
+                if (array.count == 1){
+                    VeraRoom *room = [array objectAtIndex:0];
+                    room.scenes = [room.scenes arrayByAddingObject:scene];
+                }
+                
+            }
+            
+            self.scenes = scenes;
+
+            
+            
+            
+            
             dispatch_async(dispatch_get_main_queue(), ^(){
                 [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
             });
@@ -438,7 +488,7 @@ static VeraController *sharedInstance;
                 camera.ipAddress = [cameraDictionary objectForKey:@"ip"];
                 camera.videoUrl = [cameraDictionary objectForKey:@"streaming"];
                 camera.snapshotUrl = [cameraDictionary objectForKey:@"url"];
-                
+                [cameras addObject:camera];
             }
             
             
