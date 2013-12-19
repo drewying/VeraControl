@@ -14,6 +14,18 @@
 
 @implementation VeraSceneTrigger
 
+
+-(VeraSceneTrigger*)initWithDictionary:(NSDictionary*)dictionary{
+    self = [super init];
+    if (self){
+        self.identifier = [NSString stringWithFormat:@"%i", [dictionary[@"id"] integerValue]];
+        self.name = dictionary[@"name"];
+        self.sceneNum = dictionary[@"id"];
+        self.room = [NSString stringWithFormat:@"%@",dictionary[@"room"]];
+    }
+    return self;
+}
+
 -(void)performAction:(NSString*)action usingService:(NSString*)service onScene:(NSString*)sceneNum completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
     
     NSString *htmlString = [NSString stringWithFormat:@"%@/data_request?id=action&output_format=json&serviceId=%@&action=%@&SceneNum=%@", self.controllerUrl, service, action, sceneNum];

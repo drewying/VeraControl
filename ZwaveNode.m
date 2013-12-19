@@ -16,6 +16,7 @@
         self.identifier = dictionary[@"id"];
         self.name = dictionary[@"name"];
         self.veraDeviceFileName = [dictionary[@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
+        self.room = dictionary[@"room"];
     }
     return self;
 }
