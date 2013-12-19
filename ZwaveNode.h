@@ -14,6 +14,8 @@
 @property (nonatomic, strong) NSString *controllerUrl;
 @property (nonatomic, strong) NSString *veraDeviceFileName;
 
+-(ZwaveNode*)initWithDictionary:(NSDictionary*)dictionary;
+
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback;
 
 -(void)getDeviceTriggers:(void(^)(NSArray *triggers))callback;

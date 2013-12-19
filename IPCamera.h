@@ -8,10 +8,9 @@
 
 #import "ZWaveNode.h"
 
-@interface IPCamera : ZwaveNode
+#define UPNP_DEVICE_TYPE_IP_CAMERA @"urn:schemas-upnp-org:device:DigitalSecurityCamera:2"
 
-#define UPNP_SERVICE_CAMERA @"urn:micasaverde-com:serviceId:Camera1"
-#define UPNP_SERVICE_CAMERA_PAN_TILT_ZOOM @"urn:micasaverde-com:serviceId:PanTiltZoom1"
+@interface IPCamera : ZwaveNode
 
 @property (nonatomic, assign) BOOL canPan;
 @property (nonatomic, strong) NSString *ipAddress;
@@ -19,6 +18,8 @@
 @property (nonatomic, strong) NSString *videoUrl;
 @property (nonatomic, strong) NSString *username;
 @property (nonatomic, strong) NSString *password;
+
+-(IPCamera*)initWithDictionary:(NSDictionary*)dictionary;
 
 -(void)getVideoFeedURL:(void (^)(NSURL *url))callback;
 -(void)getSnapshot:(void (^)(UIImage *image))callback;

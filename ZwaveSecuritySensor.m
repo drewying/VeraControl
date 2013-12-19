@@ -10,4 +10,29 @@
 
 @implementation ZwaveSecuritySensor
 
+#define UPNP_SERVICE_SENSOR_SECURITY @"urn:micasaverde-com:serviceId:SecuritySensor1"
+
+-(ZwaveSecuritySensor*)initWithDictionary:(NSDictionary*)dictionary{
+    self = [super initWithDictionary:dictionary];
+    if (self){
+        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+            NSString *service = serviceDictionary[@"service"];
+            if ([service isEqualToString:UPNP_SERVICE_SENSOR_SECURITY]){
+                NSString *variable = serviceDictionary[@"variable"];
+                if ([variable isEqualToString:@"Armed"]){
+                    self.armed = [serviceDictionary[@"value"] integerValue];
+                }
+                if ([variable isEqualToString:@"ArmedTripped"]){
+                    //TODO
+                    
+                }
+                if ([variable isEqualToString:@"Tripped"]){
+                    self.tripped = [serviceDictionary[@"value"] integerValue];
+                }
+            }
+        }
+    }
+    return self;
+}
+
 @end

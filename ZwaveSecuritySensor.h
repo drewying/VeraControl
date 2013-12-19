@@ -8,11 +8,14 @@
 
 #import "ZWaveNode.h"
 
-#define UPNP_SERVICE_SENSOR_SECURITY @"urn:micasaverde-com:serviceId:SecuritySensor1"
+#define UPNP_DEVICE_TYPE_MOTION_SENSOR @"urn:schemas-micasaverde-com:device:MotionSensor:1"
 
 @interface ZwaveSecuritySensor : ZwaveNode
 @property (nonatomic, assign) BOOL state;
 @property (nonatomic, assign) BOOL tripped;
 @property (nonatomic, assign) NSDate *lastTrip;
 @property (nonatomic, assign) BOOL armed;
+
+-(ZwaveSecuritySensor*)initWithDictionary:(NSDictionary*)dictionary;
+
 @end

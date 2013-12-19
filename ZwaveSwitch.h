@@ -9,12 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "ZWaveNode.h"
 
-#define UPNP_SERVICE_SWITCH @"urn:upnp-org:serviceId:SwitchPower1"
+#define UPNP_DEVICE_TYPE_SWITCH @"urn:schemas-upnp-org:device:BinaryLight:1"
 
 @interface ZwaveSwitch : ZwaveNode
 
 @property (nonatomic, assign) BOOL on;
 
 -(void)setOn:(BOOL)on completion:(void(^)())callback;
+-(ZwaveSwitch*)initWithDictionary:(NSDictionary*)dictionary;
 
 @end

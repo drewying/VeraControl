@@ -31,6 +31,7 @@
 
 //These arrays will be automatically populated by running the refreshDevices or refreshDeviceExtended methods
 @property (nonatomic, strong) NSArray *rooms;
+@property (nonatomic, strong) NSArray *scenes;
 @property (nonatomic, strong) NSArray *switches;
 @property (nonatomic, strong) NSArray *locks;
 @property (nonatomic, strong) NSArray *dimmerSwitches;

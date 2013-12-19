@@ -8,7 +8,40 @@
 
 #import "IPCamera.h"
 
+#define UPNP_SERVICE_CAMERA @"urn:micasaverde-com:serviceId:Camera1"
+#define UPNP_SERVICE_CAMERA_PAN_TILT_ZOOM @"urn:micasaverde-com:serviceId:PanTiltZoom1"
+
 @implementation IPCamera
+
+-(IPCamera*)initWithDictionary:(NSDictionary*)dictionary{
+    self = [super initWithDictionary:dictionary];
+    if (self){
+        self.username = [dictionary objectForKey:@"username"];
+        self.password = [dictionary objectForKey:@"password"];
+        self.ipAddress = [dictionary objectForKey:@"ipaddress"];
+        
+        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+            NSString *service = serviceDictionary[@"service"];
+            if ([service isEqualToString:UPNP_SERVICE_CAMERA]){
+                NSString *variable = serviceDictionary[@"variable"];
+                if ([variable isEqualToString:@"URL"]){
+                    self.snapshotUrl = serviceDictionary[@"value"];
+                }
+                if ([variable isEqualToString:@"DirectStreamingURL"]){
+                    self.videoUrl = serviceDictionary[@"value"];
+                }
+                if ([variable isEqualToString:@"Commands"]){
+                    NSString *commandString = serviceDictionary[@"value"];
+                    if ([commandString hasPrefix:@"camera_up"]){
+                        self.canPan = YES;
+                    }
+                }
+            }
+        }
+
+    }
+    return self;
+}
 
 -(void)getVideoFeedURL:(void (^)(NSURL *url))callback{
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/data_request?id=relay&device=%@", self.controllerUrl, self.identifier]];

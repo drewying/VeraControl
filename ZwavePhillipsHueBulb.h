@@ -8,14 +8,17 @@
 
 #import "ZwaveNode.h"
 
-#define UPNP_SERVICE_PHILLIPS_HUE_BULB @"urn:intvelt-com:serviceId:HueColors1"
 
 @interface ZwavePhillipsHueBulb : ZwaveNode
+
+#define UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB @"urn:schemas-intvelt-com:device:HueLamp:1"
 
 @property (nonatomic, assign) NSInteger saturation;
 @property (nonatomic, assign) NSInteger hue;
 @property (nonatomic, assign) NSInteger temperature;
 @property (nonatomic, readonly) UIColor *color;
+
+-(ZwavePhillipsHueBulb*)initWithDictionary:(NSDictionary*)dictionary;
 
 -(void)setColor:(UIColor*)color completion:(void(^)())callback;
 -(void)setTemperature:(NSInteger)temperature completed:(void(^)())callback;

@@ -8,12 +8,13 @@
 
 #import "ZwaveSwitch.h"
 
-#define UPNP_SERVICE_DIMMER @"urn:upnp-org:serviceId:Dimming1"
+#define UPNP_DEVICE_TYPE_DIMMABLE_SWITCH @"urn:schemas-upnp-org:device:DimmableLight:1"
 
 @interface ZwaveDimmerSwitch : ZwaveSwitch
 
 @property (nonatomic, assign) NSInteger brightness;
 
+-(ZwaveDimmerSwitch*)initWithDictionary:(NSDictionary*)dictionary;
 
 -(void)setBrightness:(NSInteger)brightness completion:(void(^)())callback;
 

@@ -10,6 +10,15 @@
 
 @implementation ZwaveNode
 
+-(ZwaveNode*)initWithDictionary:(NSDictionary*)dictionary{
+    self = [super init];
+    if (self){
+        self.identifier = dictionary[@"id"];
+        self.name = dictionary[@"name"];
+        self.veraDeviceFileName = [dictionary[@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
+    }
+    return self;
+}
 
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
     
@@ -32,10 +41,9 @@
 }
 
 -(void)getDeviceTriggers:(void(^)(NSArray *triggers))callback{
-    
     [self getDeviceFileInformation:^(NSDictionary *deviceInformation){
         NSArray *array = @[];
-        for (NSDictionary *dict in [deviceInformation objectForKey:@"eventList2"]){
+        for (NSDictionary *dict in deviceInformation[@"eventList2"]){
             array = [array arrayByAddingObject:dict];
         }
         callback(array);

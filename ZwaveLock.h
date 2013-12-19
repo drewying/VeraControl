@@ -9,12 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "ZWaveNode.h"
 
-
-#define UPNP_SERVICE_DOOR_LOCK @"urn:micasaverde-com:serviceId:DoorLock1"
+#define UPNP_DEVICE_TYPE_DOOR_LOCK @"urn:schemas-micasaverde-com:device:DoorLock:1"
 
 @interface ZwaveLock : ZwaveNode
 
 @property (nonatomic, assign) BOOL locked;
+
+-(ZwaveLock*)initWithDictionary:(NSDictionary*)dictionary;
 
 -(void)setLocked:(BOOL)locked completion:(void(^)())callback;
     

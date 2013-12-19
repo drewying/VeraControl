@@ -16,16 +16,7 @@
 #import "ZwavePhillipsHueBulb.h"
 #import "IPCamera.h"
 #import "VeraRoom.h"
-
-#define EXCLUDED_SWITCH_LIST @[]
-
-#define UPNP_DEVICE_TYPE_DIMMABLE_SWITCH @"urn:schemas-upnp-org:device:DimmableLight:1"
-#define UPNP_DEVICE_TYPE_DOOR_LOCK @"urn:schemas-micasaverde-com:device:DoorLock:1"
-#define UPNP_DEVICE_TYPE_SWITCH @"urn:schemas-upnp-org:device:BinaryLight:1"
-#define UPNP_DEVICE_TYPE_MOTION_SENSOR @"urn:schemas-micasaverde-com:device:MotionSensor:1"
-#define UPNP_DEVICE_TYPE_NEST_THERMOSTAT @"urn:schemas-watou-com:device:HVAC_ZoneThermostat:1"
-#define UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB @"urn:schemas-intvelt-com:device:HueLamp:1"
-#define UPNP_DEVICE_TYPE_IP_CAMERA @"urn:schemas-upnp-org:device:DigitalSecurityCamera:2"
+#import "VeraScene.h"
 
 @interface VeraController()
 @property (nonatomic, strong) NSTimer *heartBeat;
@@ -105,7 +96,7 @@ static VeraController *sharedInstance;
             NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
             
             
-            NSArray *parsedRooms = [responseDictionary objectForKey:@"rooms"];
+            NSArray *parsedRooms = responseDictionary[@"rooms"];
             
             //Gather the rooms
             VeraRoom *unassignedRoom = [[VeraRoom alloc] init];
@@ -124,7 +115,7 @@ static VeraController *sharedInstance;
             
             //Gather the devices
             
-            NSArray *devices = [responseDictionary objectForKey:@"devices"];
+            NSArray *devices = responseDictionary[@"devices"];
             
             NSArray *switches = @[];
             NSArray *dimmerSwitches = @[];
@@ -135,156 +126,49 @@ static VeraController *sharedInstance;
             NSArray *ipCameras = @[];
             
             for (NSDictionary *deviceDictionary in devices){
-                NSString *deviceType = [deviceDictionary objectForKey:@"device_type"];
+                NSString *deviceType = deviceDictionary[@"device_type"];
                 
                 ZwaveNode *device;
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DIMMABLE_SWITCH]){
-                    device = [[ZwaveDimmerSwitch alloc] init];
-                    ZwaveDimmerSwitch *dSwitch = (ZwaveDimmerSwitch*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
-                        NSString *service = [serviceDictionary objectForKey:@"service"];
-                        if ([service isEqualToString:UPNP_SERVICE_DIMMER]){
-                            dSwitch.brightness = [[serviceDictionary objectForKey:@"value"] integerValue];
-                        }
-                        if ([service isEqualToString:UPNP_SERVICE_SWITCH]){
-                            dSwitch.on = [[serviceDictionary objectForKey:@"value"] integerValue];
-                        }
-                    }
-                    dimmerSwitches = [dimmerSwitches arrayByAddingObject:dSwitch];
+                    device = [[ZwaveDimmerSwitch alloc] initWithDictionary:deviceDictionary];
+                    dimmerSwitches = [dimmerSwitches arrayByAddingObject:device];
                 }
                 
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_SWITCH]){
-                    device = [[ZwaveSwitch alloc] init];
-                    ZwaveSwitch *zSwitch = (ZwaveSwitch*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
-                        NSString *service = [serviceDictionary objectForKey:@"service"];
-                        if ([service isEqualToString:UPNP_SERVICE_SWITCH]){
-                            zSwitch.on = [[serviceDictionary objectForKey:@"value"] integerValue];
-                        }
-                    }
-                    switches = [switches arrayByAddingObject:zSwitch];
+                    device = [[ZwaveSwitch alloc] initWithDictionary:deviceDictionary];
+                    switches = [switches arrayByAddingObject:device];
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DOOR_LOCK]){
-                    device = [[ZwaveLock alloc] init];
-                    ZwaveLock *zLock = (ZwaveLock*)device;
-                    
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
-                        NSString *service = [serviceDictionary objectForKey:@"service"];
-                        if ([service isEqualToString:UPNP_SERVICE_DOOR_LOCK]){
-                            zLock.locked = [[serviceDictionary objectForKey:@"value"] integerValue];
-                        }
-                    }
-                    
-                    locks = [locks arrayByAddingObject:zLock];
-                    
+                    device = [[ZwaveLock alloc] initWithDictionary:deviceDictionary];
+                    locks = [locks arrayByAddingObject:device];
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_NEST_THERMOSTAT]){
-                    device = [[ZwaveThermostat alloc] init];
-                    ZwaveThermostat *zThermo = (ZwaveThermostat*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
-                        NSString *service = [serviceDictionary objectForKey:@"service"];
-                        if ([service isEqualToString:UPNP_SERVICE_TEMPERATURE_SENSOR]){
-                            zThermo.temperature = [[serviceDictionary objectForKey:@"value"] integerValue];
-                        }
-                        if ([service isEqualToString:UPNP_SERVICE_HEAT]){
-                            zThermo.temperatureHeatTarget = [[serviceDictionary objectForKey:@"value"] integerValue];
-                        }
-                        if ([service isEqualToString:UPNP_SERVICE_COOL]){
-                            zThermo.temperatureCoolTarget = [[serviceDictionary objectForKey:@"value"] integerValue];
-                        }
-                        if ([service isEqualToString:UPNP_SERVICE_HVAC_FAN]){
-                            zThermo.fanMode = [serviceDictionary objectForKey:@"value"];
-                        }
-                        if ([service isEqualToString:UPNP_SERVICE_HVAC_THERMO]){
-                            zThermo.thermoMode = [serviceDictionary objectForKey:@"value"];
-                        }
-                        thermostats = [thermostats arrayByAddingObject:zThermo];
-                    }
-                    
+                    device = [[ZwaveThermostat alloc] initWithDictionary:deviceDictionary];
+                    thermostats = [thermostats arrayByAddingObject:device];
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_MOTION_SENSOR]){
-                    device = [[ZwaveSecuritySensor alloc] init];
-                    ZwaveSecuritySensor *zSensor = (ZwaveSecuritySensor*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
-                        NSString *service = [serviceDictionary objectForKey:@"service"];
-                        if ([service isEqualToString:UPNP_SERVICE_SENSOR_SECURITY]){
-                            NSString *variable = [serviceDictionary objectForKey:@"variable"];
-                            if ([variable isEqualToString:@"Armed"]){
-                                zSensor.armed = [[serviceDictionary objectForKey:@"value"] integerValue];
-                            }
-                            if ([variable isEqualToString:@"ArmedTripped"]){
-                                //TODO
-                                
-                            }
-                            if ([variable isEqualToString:@"Tripped"]){
-                                zSensor.tripped = [[serviceDictionary objectForKey:@"value"] integerValue];
-                            }
-                        }
-                    }
-                    securitySensors = [securitySensors arrayByAddingObject:zSensor];
+                    device = [[ZwaveSecuritySensor alloc] initWithDictionary:deviceDictionary];
+                    securitySensors = [securitySensors arrayByAddingObject:device];
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB]){
-                    device = [[ZwavePhillipsHueBulb alloc] init];
-                    ZwavePhillipsHueBulb *zHue = (ZwavePhillipsHueBulb*)device;
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
-                        NSString *service = [serviceDictionary objectForKey:@"service"];
-                        if ([service isEqualToString:UPNP_SERVICE_PHILLIPS_HUE_BULB]){
-                            NSString *variable = [serviceDictionary objectForKey:@"variable"];
-                            if ([variable isEqualToString:@"Hue"]){
-                                zHue.hue = [[serviceDictionary objectForKey:@"value"] integerValue];
-                            }
-                            if ([variable isEqualToString:@"Saturation"]){
-                                zHue.saturation = [[serviceDictionary objectForKey:@"value"] integerValue];
-                                
-                            }
-                            if ([variable isEqualToString:@"ColorTemperature"]){
-                                zHue.temperature = [[serviceDictionary objectForKey:@"value"] integerValue];
-                            }
-                        }
-                    }
-                    hueBulbs = [hueBulbs arrayByAddingObject:zHue];
+                    device = [[ZwavePhillipsHueBulb alloc] initWithDictionary:deviceDictionary];
+                    hueBulbs = [hueBulbs arrayByAddingObject:device];
                 }
                 
                 if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_IP_CAMERA]){
-                    device = [[IPCamera alloc] init];
-                    IPCamera *ipCam = (IPCamera*)device;
-                    ipCam.username = [deviceDictionary objectForKey:@"username"];
-                    ipCam.password = [deviceDictionary objectForKey:@"password"];
-                    ipCam.ipAddress = [deviceDictionary objectForKey:@"ipaddress"];
-                    
-                    for (NSDictionary *serviceDictionary in [deviceDictionary objectForKey:@"states"]){
-                        NSString *service = [serviceDictionary objectForKey:@"service"];
-                        if ([service isEqualToString:UPNP_SERVICE_CAMERA]){
-                            NSString *variable = [serviceDictionary objectForKey:@"variable"];
-                            if ([variable isEqualToString:@"URL"]){
-                                ipCam.snapshotUrl = [serviceDictionary objectForKey:@"value"];
-                            }
-                            if ([variable isEqualToString:@"DirectStreamingURL"]){
-                                ipCam.videoUrl = [serviceDictionary objectForKey:@"value"];
-                            }
-                            if ([variable isEqualToString:@"Commands"]){
-                                NSString *commandString = [serviceDictionary objectForKey:@"value"];
-                                if ([commandString hasPrefix:@"camera_up"]){
-                                    ipCam.canPan = YES;
-                                }
-                            }
-                        }
-                    }
-                    ipCameras = [ipCameras arrayByAddingObject:ipCam];
+                    device = [[IPCamera alloc] initWithDictionary:deviceDictionary];
+                    ipCameras = [ipCameras arrayByAddingObject:device];
                 }
                 
                 //Add the device to the room
                 if (device){
-                    device.identifier = [deviceDictionary objectForKey:@"id"];
-                    device.name = [deviceDictionary objectForKey:@"name"];
                     device.controllerUrl = [self controlUrl];
-                    device.veraDeviceFileName = [[deviceDictionary objectForKey:@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
                     NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", [deviceDictionary objectForKey:@"room"]]];
                     if (array.count == 1){
                         VeraRoom *room = [array objectAtIndex:0];
@@ -300,6 +184,16 @@ static VeraController *sharedInstance;
             self.locks = locks;
             self.thermostats = thermostats;
             self.ipCameras = ipCameras;
+            
+            //Get Scenes
+            self.scenes = @[];
+            NSArray *scenes = responseDictionary[@"scenes"];
+            for (NSDictionary *dictionary in scenes){
+                VeraScene *scene = [[VeraScene alloc] initWithDictionary:dictionary];
+                scene.controllerUrl = [self controlUrl];
+                self.scenes = [self.scenes arrayByAddingObject:scene];
+            }
+            
             dispatch_async(dispatch_get_main_queue(), ^(){
                 [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
             });
@@ -371,9 +265,8 @@ static VeraController *sharedInstance;
                 zSwitch.identifier = [[dictionary objectForKey:@"id"] stringValue];
                 zSwitch.on = [[dictionary objectForKey:@"status"] boolValue];
                 zSwitch.controllerUrl = [self controlUrl];
-                if ([EXCLUDED_SWITCH_LIST filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"integerValue == %i", [zSwitch.identifier integerValue]]].count==0){
-                    [switches addObject:zSwitch];
-                }
+                [switches addObject:zSwitch];
+        
                 
                 NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", [[dictionary objectForKey:@"room"] stringValue]]];
                 if (array.count == 1){

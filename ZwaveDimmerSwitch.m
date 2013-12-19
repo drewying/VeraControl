@@ -8,7 +8,23 @@
 
 #import "ZwaveDimmerSwitch.h"
 
+#define UPNP_SERVICE_DIMMER @"urn:upnp-org:serviceId:Dimming1"
+
 @implementation ZwaveDimmerSwitch
+
+-(ZwaveDimmerSwitch*)initWithDictionary:(NSDictionary*)dictionary{
+    self = [super initWithDictionary:dictionary];
+    if (self){
+        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+            NSString *service = serviceDictionary[@"service"];
+            NSString *variable = serviceDictionary[@"variable"];
+            if ([service isEqualToString:UPNP_SERVICE_DIMMER] && [variable isEqualToString:@"LoadLevelStatus"]){
+                self.brightness = [serviceDictionary[@"value"] integerValue];
+            }
+        }
+    }
+    return self;
+}
 
 -(void)setBrightness:(NSInteger)brightness completion:(void(^)())callback{
     [self performAction:[NSString stringWithFormat:@"SetLoadLevelTarget&newLoadlevelTarget=%i",brightness] usingService:UPNP_SERVICE_DIMMER completion:^(NSURLResponse *response, NSData *data, NSError *error){

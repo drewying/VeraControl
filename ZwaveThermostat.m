@@ -8,7 +8,38 @@
 
 #import "ZWaveThermostat.h"
 
+#define UPNP_SERVICE_HEAT @"urn:upnp-org:serviceId:TemperatureSetpoint1_Heat"
+#define UPNP_SERVICE_COOL @"urn:upnp-org:serviceId:TemperatureSetpoint1_Cool"
+#define UPNP_SERVICE_HVAC_FAN @"urn:upnp-org:serviceId:HVAC_FanOperatingMode1"
+#define UPNP_SERVICE_HVAC_THERMO @"urn:upnp-org:serviceId:HVAC_UserOperatingMode1"
+#define UPNP_SERVICE_TEMPERATURE_SENSOR @"urn:upnp-org:serviceId:TemperatureSensor1"
+
 @implementation ZwaveThermostat
+
+-(ZwaveThermostat*)initWithDictionary:(NSDictionary*)dictionary{
+    self = [super initWithDictionary:dictionary];
+    if (self){
+        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+            NSString *service = serviceDictionary[@"service"];
+            if ([service isEqualToString:UPNP_SERVICE_TEMPERATURE_SENSOR]){
+                self.temperature = [serviceDictionary[@"value"] integerValue];
+            }
+            if ([service isEqualToString:UPNP_SERVICE_HEAT]){
+                self.temperatureHeatTarget = [serviceDictionary[@"value"] integerValue];
+            }
+            if ([service isEqualToString:UPNP_SERVICE_COOL]){
+                self.temperatureCoolTarget = [serviceDictionary[@"value"] integerValue];
+            }
+            if ([service isEqualToString:UPNP_SERVICE_HVAC_FAN]){
+                self.fanMode = serviceDictionary[@"value"];
+            }
+            if ([service isEqualToString:UPNP_SERVICE_HVAC_THERMO]){
+                self.thermoMode = serviceDictionary[@"value"];
+            }
+        }
+    }
+    return self;
+}
 
 -(void)setTemperatureHeatTarget:(NSInteger)temperatureHeatTarget completion:(void(^)())callback{
     [self performAction:[NSString stringWithFormat:@"SetCurrentSetpoint&NewCurrentSetpoint=%i", temperatureHeatTarget] usingService:UPNP_SERVICE_HEAT completion:^(NSURLResponse *response, NSData *data, NSError *error){
