@@ -1,14 +1,16 @@
 VeraControl
 ===========
 
-A small library to assist in controlling of a micasaverde Vera unit. More information on Vera can be found here:
-http://www.micasaverde.com/controllers/
+A small library to assist in controlling of a micasaverde Vera unit. 
 
-Still a very early work in progress. 
+Vera is a home automation controller designed to work with Z-Wave enabled home automated devices as well as "virtual devices" via an IP interface.
+
+More information on Vera can be found here:
+http://www.micasaverde.com/controllers/
 
 Usage:
 
-The main class is the VeraController. You can look at the VeraController.ht for a good overview of what's available. But here is a quick example for you.
+The main class is the VeraController. You can look at the VeraController.h for a good overview of what's available. But here is a quick example for you.
 
 Discovery:
 ```
@@ -16,7 +18,7 @@ VeraController *veraController = [VeraController sharedInstance];
 veraController.username = @"MyMiosUsername";
 veraController.password = @"MyMiosPassword";
 [veraController findVeraController]; //This automaticallly determines whether the controller is local or remote.
-[veraController refreshDevices] //This populates all the device arrays, sending out a NSNotification when complete.
+[veraController refreshDevices] //This populates all the device arrays, rooms, and scenes, sending out a NSNotification when complete.
 ```
 
 Turn on a lightswitch:
