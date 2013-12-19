@@ -17,4 +17,11 @@
     return _devices;
 }
 
+-(NSArray*)scenes{
+    if (!_scenes){
+        _scenes = @[];
+    }
+    return _scenes;
+}
+
 @end

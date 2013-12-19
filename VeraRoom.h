@@ -12,5 +12,6 @@
 @property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSArray *devices;
+@property (nonatomic, strong) NSArray *scenes;
 @property (nonatomic, strong) NSString *section;
 @end
