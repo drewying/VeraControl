@@ -40,11 +40,16 @@ static VeraController *sharedInstance;
 }
 
 -(void)startHeartbeat{
-    self.heartBeat = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(refreshDevices) userInfo:nil repeats:YES];
-    [self.heartBeat fire];
+    if (self.heartBeat == nil || ![self.heartBeat isValid]) {
+        self.heartBeat = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(refreshDevices) userInfo:nil repeats:YES];
+        [self.heartBeat fire];
+    }
 }
 
 -(void)stopHeartbeat{
+    if (self.heartBeat == nil)
+        return;
+    
     [self.heartBeat invalidate];
 }
 
@@ -97,26 +102,51 @@ static VeraController *sharedInstance;
         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
         if (r.statusCode ==200){
             NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-            NSArray *parsedRooms = responseDictionary[@"rooms"];
             
             //Gather the rooms
-            VeraRoom *unassignedRoom = [[VeraRoom alloc] init];
-            unassignedRoom.name = @"Unassigned";
-            unassignedRoom.identifier = @"0";
-            unassignedRoom.section = @"0";
-            unassignedRoom.devices = @[];
-            self.rooms = @[unassignedRoom];
+            NSArray *parsedRooms = responseDictionary[@"rooms"];
+            
+            if (self.roomsDictionary == nil) {
+                self.roomsDictionary = [[NSMutableDictionary alloc] initWithCapacity:(parsedRooms.count+1)];
+                
+                VeraRoom *unassignedRoom = [[VeraRoom alloc] init];
+                unassignedRoom.name = @"Unassigned";
+                unassignedRoom.identifier = @"0";
+                unassignedRoom.section = @"0";
+                
+                [self.roomsDictionary setObject:unassignedRoom forKey:unassignedRoom.identifier];
+            }
+            
+            //Add the unassigned room
+            self.rooms = @[[self.roomsDictionary objectForKey:@"0"]];
+            
             for (NSDictionary *parsedRoom in parsedRooms){
-                VeraRoom *room = [[VeraRoom alloc] init];
-                room.name = [parsedRoom objectForKey:@"name"];
-                room.identifier = [[parsedRoom objectForKey:@"id"] stringValue];
-                room.section = [parsedRoom objectForKey:@"section"];
-                self.rooms = [self.rooms arrayByAddingObject:room];
+                //Check to see if the room exists and update it, if not create one
+                NSString *identifier = [[parsedRoom objectForKey:@"id"] stringValue];
+                VeraRoom *room = self.roomsDictionary[identifier];
+                
+                if (room == nil) {
+                    VeraRoom *room = [[VeraRoom alloc] init];
+                    room.name = [parsedRoom objectForKey:@"name"];
+                    room.identifier = [[parsedRoom objectForKey:@"id"] stringValue];
+                    room.section = [parsedRoom objectForKey:@"section"];
+                    self.rooms = [self.rooms arrayByAddingObject:room];
+                    [self.roomsDictionary setObject:room forKey:room.identifier];
+                }
+                else {
+                    room.name = [parsedRoom objectForKey:@"name"];
+                    room.identifier = [[parsedRoom objectForKey:@"id"] stringValue];
+                    room.section = [parsedRoom objectForKey:@"section"];
+                    
+                    //Clear the devices since we are going to refill it
+                    //TODO: We should create a devices dictionary as well
+                    room.devices = @[];
+                }
             }
             
             //Gather the devices
-            
             NSArray *devices = responseDictionary[@"devices"];
+            
             NSArray *switches = @[];
             NSArray *dimmerSwitches = @[];
             NSArray *locks = @[];
@@ -125,55 +155,77 @@ static VeraController *sharedInstance;
             NSArray *hueBulbs = @[];
             NSArray *ipCameras = @[];
             
-            for (NSDictionary *deviceDictionary in devices){
-                NSString *deviceType = deviceDictionary[@"device_type"];
+            if (self.deviceDictionary == nil) {
+                self.deviceDictionary = [[NSMutableDictionary alloc] initWithCapacity:devices.count];
+            }
+            
+            for (NSDictionary *deviceData in devices){
+                NSString *deviceType = deviceData[@"device_type"];
+                NSString *deviceIdentifier = deviceData[@"id"];
                 
-                ZwaveNode *device;
+                ZwaveNode *device = self.deviceDictionary[deviceIdentifier];
                 
-                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DIMMABLE_SWITCH]){
-                    device = [[ZwaveDimmerSwitch alloc] initWithDictionary:deviceDictionary];
-                    dimmerSwitches = [dimmerSwitches arrayByAddingObject:device];
+                if (device == nil) {
+                    //Create a new ZWaveNode based on deviceType
+                    
+                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DIMMABLE_SWITCH]){
+                        device = [[ZwaveDimmerSwitch alloc] initWithDictionary:deviceData];
+                        dimmerSwitches = [dimmerSwitches arrayByAddingObject:device];
+                    }
+                    
+                    
+                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_SWITCH]){
+                        device = [[ZwaveSwitch alloc] initWithDictionary:deviceData];
+                        switches = [switches arrayByAddingObject:device];
+                    }
+                    
+                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DOOR_LOCK]){
+                        device = [[ZwaveLock alloc] initWithDictionary:deviceData];
+                        locks = [locks arrayByAddingObject:device];
+                    }
+                    
+                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_NEST_THERMOSTAT]){
+                        device = [[ZwaveThermostat alloc] initWithDictionary:deviceData];
+                        thermostats = [thermostats arrayByAddingObject:device];
+                    }
+                    
+                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_MOTION_SENSOR]){
+                        device = [[ZwaveSecuritySensor alloc] initWithDictionary:deviceData];
+                        securitySensors = [securitySensors arrayByAddingObject:device];
+                    }
+                    
+                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB]){
+                        device = [[ZwavePhillipsHueBulb alloc] initWithDictionary:deviceData];
+                        hueBulbs = [hueBulbs arrayByAddingObject:device];
+                    }
+                    
+                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_IP_CAMERA]){
+                        device = [[IPCamera alloc] initWithDictionary:deviceData];
+                        ipCameras = [ipCameras arrayByAddingObject:device];
+                    }
+                    
+                    if (device)
+                        [self.deviceDictionary setObject:device forKey:deviceIdentifier];
                 }
-                
-                
-                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_SWITCH]){
-                    device = [[ZwaveSwitch alloc] initWithDictionary:deviceDictionary];
-                    switches = [switches arrayByAddingObject:device];
-                }
-                
-                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DOOR_LOCK]){
-                    device = [[ZwaveLock alloc] initWithDictionary:deviceDictionary];
-                    locks = [locks arrayByAddingObject:device];
-                }
-                
-                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_NEST_THERMOSTAT]){
-                    device = [[ZwaveThermostat alloc] initWithDictionary:deviceDictionary];
-                    thermostats = [thermostats arrayByAddingObject:device];
-                }
-                
-                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_MOTION_SENSOR]){
-                    device = [[ZwaveSecuritySensor alloc] initWithDictionary:deviceDictionary];
-                    securitySensors = [securitySensors arrayByAddingObject:device];
-                }
-                
-                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB]){
-                    device = [[ZwavePhillipsHueBulb alloc] initWithDictionary:deviceDictionary];
-                    hueBulbs = [hueBulbs arrayByAddingObject:device];
-                }
-                
-                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_IP_CAMERA]){
-                    device = [[IPCamera alloc] initWithDictionary:deviceDictionary];
-                    ipCameras = [ipCameras arrayByAddingObject:device];
+                else {
+                    //Update the device
+                    [device updateWithDictionary:deviceData];
                 }
                 
                 //Add the device to the room
                 if (device){
                     device.controllerUrl = [self controlUrl];
-                    NSArray *array = [self.rooms filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", [deviceDictionary objectForKey:@"room"]]];
-                    if (array.count == 1){
-                        VeraRoom *room = [array objectAtIndex:0];
+                    VeraRoom *room = [self.roomsDictionary objectForKey:device.room];
+                    NSAssert((room != nil), @"Room does not exist - %@", device.room);
+                    
+                    //Scan the array to see if the device is already added to the room
+                    //TODO: This might make sense being a dictionary as well. Also need to deal with device being removed from a room.
+                    NSArray *array = [room.devices filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", device.identifier]];
+                    if (array.count == 0){
+                        //Device not found, add it
                         room.devices = [room.devices arrayByAddingObject:device];
                     }
+
                 }
             }
             
@@ -187,11 +239,28 @@ static VeraController *sharedInstance;
             
             //Get Scenes
             self.scenes = @[];
+            
+            //Clear all the room scenes
+            //TODO: Make scenes an updateable dictionary like rooms and devices
+            for (id roomid in self.roomsDictionary) {
+                VeraRoom *room = [self.roomsDictionary objectForKey:roomid];
+                room.scenes = @[];
+            }
+            
             NSArray *scenes = responseDictionary[@"scenes"];
             for (NSDictionary *dictionary in scenes){
                 VeraSceneTrigger *scene = [[VeraSceneTrigger alloc] initWithDictionary:dictionary];
                 scene.controllerUrl = [self controlUrl];
                 self.scenes = [self.scenes arrayByAddingObject:scene];
+                
+                VeraRoom *room = [self.roomsDictionary objectForKey:scene.room];
+                NSAssert((room != nil), @"Room does not exist - %@", scene.room);
+                NSArray *array = [room.scenes filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"sceneNum == %@", scene.sceneNum]];
+                if (array.count == 0){
+                    //Scene not found, add it
+                    //TODO: deal with device removals
+                    room.scenes = [room.scenes arrayByAddingObject:scene];
+                }
             }
             
             dispatch_async(dispatch_get_main_queue(), ^(){
