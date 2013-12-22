@@ -12,18 +12,16 @@
 
 @implementation ZwaveDimmerSwitch
 
--(ZwaveDimmerSwitch*)initWithDictionary:(NSDictionary*)dictionary{
-    self = [super initWithDictionary:dictionary];
-    if (self){
-        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
-            NSString *service = serviceDictionary[@"service"];
-            NSString *variable = serviceDictionary[@"variable"];
-            if ([service isEqualToString:UPNP_SERVICE_DIMMER] && [variable isEqualToString:@"LoadLevelStatus"]){
-                self.brightness = [serviceDictionary[@"value"] integerValue];
-            }
+-(void)updateWithDictionary:(NSDictionary *)dictionary {
+    [super updateWithDictionary:dictionary];
+    
+    for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+        NSString *service = serviceDictionary[@"service"];
+        NSString *variable = serviceDictionary[@"variable"];
+        if ([service isEqualToString:UPNP_SERVICE_DIMMER] && [variable isEqualToString:@"LoadLevelStatus"]){
+            self.brightness = [serviceDictionary[@"value"] integerValue];
         }
     }
-    return self;
 }
 
 -(void)setBrightness:(NSInteger)brightness completion:(void(^)())callback{

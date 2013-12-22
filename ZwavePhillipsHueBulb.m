@@ -12,29 +12,25 @@
 
 #define UPNP_SERVICE_PHILLIPS_HUE_BULB @"urn:intvelt-com:serviceId:HueColors1"
 
--(ZwavePhillipsHueBulb*)initWithDictionary:(NSDictionary*)dictionary{
-    self = [super initWithDictionary:dictionary];
-    if (self){
-        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
-            NSString *service = serviceDictionary[@"service"];
-            if ([service isEqualToString:UPNP_SERVICE_PHILLIPS_HUE_BULB]){
-                NSString *variable = serviceDictionary[@"variable"];
-                if ([variable isEqualToString:@"Hue"]){
-                    self.hue = [serviceDictionary[@"value"] integerValue];
-                }
-                if ([variable isEqualToString:@"Saturation"]){
-                    self.saturation = [serviceDictionary[@"value"] integerValue];
-                    
-                }
-                if ([variable isEqualToString:@"ColorTemperature"]){
-                    self.temperature = [serviceDictionary[@"value"] integerValue];
-                }
+-(void)updateWithDictionary:(NSDictionary *)dictionary {
+    [super updateWithDictionary:dictionary];
+    for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+        NSString *service = serviceDictionary[@"service"];
+        if ([service isEqualToString:UPNP_SERVICE_PHILLIPS_HUE_BULB]){
+            NSString *variable = serviceDictionary[@"variable"];
+            if ([variable isEqualToString:@"Hue"]){
+                self.hue = [serviceDictionary[@"value"] integerValue];
+            }
+            if ([variable isEqualToString:@"Saturation"]){
+                self.saturation = [serviceDictionary[@"value"] integerValue];
+                
+            }
+            if ([variable isEqualToString:@"ColorTemperature"]){
+                self.temperature = [serviceDictionary[@"value"] integerValue];
             }
         }
     }
-    return self;
 }
-
 
 -(void)setColor:(UIColor*)color completion:(void(^)())callback{
     CGFloat cHue;

@@ -14,8 +14,6 @@
 
 @property (nonatomic, assign) NSInteger brightness;
 
--(ZwaveDimmerSwitch*)initWithDictionary:(NSDictionary*)dictionary;
-
 -(void)setBrightness:(NSInteger)brightness completion:(void(^)())callback;
 
 @end

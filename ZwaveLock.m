@@ -12,18 +12,15 @@
 
 @implementation ZwaveLock
 
--(ZwaveLock*)initWithDictionary:(NSDictionary*)dictionary{
-    self = [super initWithDictionary:dictionary];
-    if (self){
-        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
-            NSString *service = serviceDictionary[@"service"];
-            NSString *variable = serviceDictionary[@"variable"];
-            if ([service isEqualToString:UPNP_SERVICE_DOOR_LOCK] && [variable isEqualToString:@"Status"]){
-                self.locked = [serviceDictionary[@"value"] integerValue];
-            }
+-(void)updateWithDictionary:(NSDictionary *)dictionary {
+    [super updateWithDictionary:dictionary];
+    for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+        NSString *service = serviceDictionary[@"service"];
+        NSString *variable = serviceDictionary[@"variable"];
+        if ([service isEqualToString:UPNP_SERVICE_DOOR_LOCK] && [variable isEqualToString:@"Status"]){
+            self.locked = [serviceDictionary[@"value"] integerValue];
         }
     }
-    return self;
 }
 
 -(void)setLocked:(BOOL)locked completion:(void(^)())callback{

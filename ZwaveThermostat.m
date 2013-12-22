@@ -16,29 +16,26 @@
 
 @implementation ZwaveThermostat
 
--(ZwaveThermostat*)initWithDictionary:(NSDictionary*)dictionary{
-    self = [super initWithDictionary:dictionary];
-    if (self){
-        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
-            NSString *service = serviceDictionary[@"service"];
-            if ([service isEqualToString:UPNP_SERVICE_TEMPERATURE_SENSOR]){
-                self.temperature = [serviceDictionary[@"value"] integerValue];
-            }
-            if ([service isEqualToString:UPNP_SERVICE_HEAT]){
-                self.temperatureHeatTarget = [serviceDictionary[@"value"] integerValue];
-            }
-            if ([service isEqualToString:UPNP_SERVICE_COOL]){
-                self.temperatureCoolTarget = [serviceDictionary[@"value"] integerValue];
-            }
-            if ([service isEqualToString:UPNP_SERVICE_HVAC_FAN]){
-                self.fanMode = serviceDictionary[@"value"];
-            }
-            if ([service isEqualToString:UPNP_SERVICE_HVAC_THERMO]){
-                self.thermoMode = serviceDictionary[@"value"];
-            }
+-(void)updateWithDictionary:(NSDictionary *)dictionary {
+    [super updateWithDictionary:dictionary];
+    for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+        NSString *service = serviceDictionary[@"service"];
+        if ([service isEqualToString:UPNP_SERVICE_TEMPERATURE_SENSOR]){
+            self.temperature = [serviceDictionary[@"value"] integerValue];
+        }
+        if ([service isEqualToString:UPNP_SERVICE_HEAT]){
+            self.temperatureHeatTarget = [serviceDictionary[@"value"] integerValue];
+        }
+        if ([service isEqualToString:UPNP_SERVICE_COOL]){
+            self.temperatureCoolTarget = [serviceDictionary[@"value"] integerValue];
+        }
+        if ([service isEqualToString:UPNP_SERVICE_HVAC_FAN]){
+            self.fanMode = serviceDictionary[@"value"];
+        }
+        if ([service isEqualToString:UPNP_SERVICE_HVAC_THERMO]){
+            self.thermoMode = serviceDictionary[@"value"];
         }
     }
-    return self;
 }
 
 -(void)setTemperatureHeatTarget:(NSInteger)temperatureHeatTarget completion:(void(^)())callback{
