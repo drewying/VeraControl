@@ -67,6 +67,10 @@ static VeraController *sharedInstance;
             self.useMiosRemoteService = (self.ipAddress.length < 7);
             [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:nil];
         }
+        else {
+            //There was an error locating the device, probably due to bad credentials
+            [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:[NSError errorWithDomain:@"VeraControl - Could not locate Vera Controller" code:50 userInfo:nil]];
+        }
     }];
 }
 
@@ -83,8 +87,8 @@ static VeraController *sharedInstance;
     
     if (self.useMiosRemoteService || self.ipAddress.length == 0){
         if ([self.veraSerialNumber length] == 0)
-            return [NSString stringWithFormat:@"http://%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword];
-        return [NSString stringWithFormat:@"http://%@/%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword, self.veraSerialNumber];
+            return [NSString stringWithFormat:@"https://%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword];
+        return [NSString stringWithFormat:@"https://%@/%@/%@/%@", self.miosHostname, self.miosUsername, self.miosPassword, self.veraSerialNumber];
     }
     else{
         return [NSString stringWithFormat:@"http://%@:3480", self.ipAddress];
@@ -100,8 +104,15 @@ static VeraController *sharedInstance;
 -(void)refreshDevices{
     [self performCommand:@"id=user_data" completion:^(NSURLResponse *response, NSData *data, NSError *error){
         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
+        
         if (r.statusCode ==200){
             NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+            
+            if (error != nil) {
+                //There was an error processing JSON, this happens if username/password is invalid
+                [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:[NSError errorWithDomain:@"VeraControl - Error refreshing devices" code:50 userInfo:error.userInfo]];
+                return;
+            }
             
             //Gather the rooms
             NSArray *parsedRooms = responseDictionary[@"rooms"];
@@ -268,6 +279,5 @@ static VeraController *sharedInstance;
             });
         }
     }];
-        
 }
 @end
