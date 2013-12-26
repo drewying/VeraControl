@@ -16,6 +16,4 @@
 @property (nonatomic, assign) NSDate *lastTrip;
 @property (nonatomic, assign) BOOL armed;
 
--(ZwaveSecuritySensor*)initWithDictionary:(NSDictionary*)dictionary;
-
 @end

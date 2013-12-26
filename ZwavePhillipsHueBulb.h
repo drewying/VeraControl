@@ -18,8 +18,6 @@
 @property (nonatomic, assign) NSInteger temperature;
 @property (nonatomic, readonly) UIColor *color;
 
--(ZwavePhillipsHueBulb*)initWithDictionary:(NSDictionary*)dictionary;
-
 -(void)setColor:(UIColor*)color completion:(void(^)())callback;
 -(void)setTemperature:(NSInteger)temperature completed:(void(^)())callback;
 

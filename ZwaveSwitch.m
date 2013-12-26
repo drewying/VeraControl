@@ -12,18 +12,15 @@
 
 @implementation ZwaveSwitch
 
--(ZwaveSwitch*)initWithDictionary:(NSDictionary*)dictionary{
-    self = [super initWithDictionary:dictionary];
-    if (self){
-        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
-            NSString *service = serviceDictionary[@"service"];
-            NSString *variable = serviceDictionary[@"variable"];
-            if ([service isEqualToString:UPNP_SERVICE_SWITCH] && [variable isEqualToString:@"Status"]){
-                self.on = [serviceDictionary[@"value"] integerValue];
-            }
+-(void)updateWithDictionary:(NSDictionary *)dictionary {
+    [super updateWithDictionary:dictionary];
+    for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+        NSString *service = serviceDictionary[@"service"];
+        NSString *variable = serviceDictionary[@"variable"];
+        if ([service isEqualToString:UPNP_SERVICE_SWITCH] && [variable isEqualToString:@"Status"]){
+            self.on = [serviceDictionary[@"value"] integerValue];
         }
     }
-    return self;
 }
 
 -(void)setOn:(BOOL)on completion:(void(^)())callback{

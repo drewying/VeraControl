@@ -28,8 +28,6 @@
 @property (nonatomic, assign) NSInteger temperatureHeatTarget;
 @property (nonatomic, assign) NSInteger temperatureCoolTarget;
 
--(ZwaveThermostat*)initWithDictionary:(NSDictionary*)dictionary;
-
 -(void)setTemperatureHeatTarget:(NSInteger)temperatureHeatTarget completion:(void(^)())callback;
 -(void)setTemperatureCoolTarget:(NSInteger)temperatureCoolTarget completion:(void(^)())callback;
 -(void)setFanMode:(NSString *)fanMode completion:(void(^)())callback;

@@ -15,8 +15,6 @@
 
 @property (nonatomic, assign) BOOL locked;
 
--(ZwaveLock*)initWithDictionary:(NSDictionary*)dictionary;
-
 -(void)setLocked:(BOOL)locked completion:(void(^)())callback;
     
 @end

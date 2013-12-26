@@ -16,6 +16,5 @@
 @property (nonatomic, assign) BOOL on;
 
 -(void)setOn:(BOOL)on completion:(void(^)())callback;
--(ZwaveSwitch*)initWithDictionary:(NSDictionary*)dictionary;
 
 @end
