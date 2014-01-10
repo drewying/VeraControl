@@ -16,7 +16,7 @@
 #import "ZwavePhillipsHueBulb.h"
 #import "IPCamera.h"
 #import "VeraRoom.h"
-#import "VeraSceneTrigger.h"
+#import "VeraScene.h"
 
 //This is the default forward server
 #define FORWARD_SERVER_DEFAULT @"fwd5.mios.com"
@@ -51,6 +51,10 @@ static VeraController *sharedInstance;
 -(void)findVeraController{
     NSURL *url = [NSURL URLWithString:[self locateUrl]];
     [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:url] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+        if (error){
+            return;
+        }
+        
         NSDictionary *miosLocatorResponse = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
         NSArray *units = [miosLocatorResponse objectForKey:@"units"];
         if (units.count > 0){
@@ -61,6 +65,7 @@ static VeraController *sharedInstance;
             self.miosHostname = [mainUnit objectForKey:@"active_server"];
             self.useMiosRemoteService = (self.ipAddress.length < 7);
             [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:nil];
+            [self refreshDevices];
         }
     }];
 }
@@ -189,7 +194,7 @@ static VeraController *sharedInstance;
             self.scenes = @[];
             NSArray *scenes = responseDictionary[@"scenes"];
             for (NSDictionary *dictionary in scenes){
-                VeraSceneTrigger *scene = [[VeraSceneTrigger alloc] initWithDictionary:dictionary];
+                VeraScene *scene = [[VeraScene alloc] initWithDictionary:dictionary];
                 scene.controllerUrl = [self controlUrl];
                 self.scenes = [self.scenes arrayByAddingObject:scene];
             }
@@ -200,5 +205,15 @@ static VeraController *sharedInstance;
         }
     }];
         
+}
+
+-(VeraScene*)getEmptyScene{
+    VeraScene *scene = [[VeraScene alloc] init];
+    scene.controllerUrl = [self controlUrl];
+    scene.name = @"Test Scene";
+    scene.triggers = @[];
+    scene.actions = @[];
+    scene.schedules = @[];
+    return scene;
 }
 @end

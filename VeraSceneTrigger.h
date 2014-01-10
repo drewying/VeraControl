@@ -1,24 +1,36 @@
 //
 //  VeraSceneTrigger.h
-//  C2
+//  Home
 //
-//  Created by Drew Ingebretsen on 9/22/13.
-//  Copyright (c) 2013 People Tech. All rights reserved.
+//  Created by Drew Ingebretsen on 12/19/13.
+//  Copyright (c) 2013 PeopleTech. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
 @interface VeraSceneTrigger : NSObject
 
-@property (nonatomic, strong) NSString *name;
-@property (nonatomic, strong) NSString *sceneNum;
-@property (nonatomic, strong) NSString *room;
-@property (nonatomic, strong) NSString *controllerUrl;
-@property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, strong) NSArray *triggerArguments;
+@property (nonatomic, strong) NSString *triggerDevice;
+@property (nonatomic, assign) BOOL triggerEnabled;
+@property (nonatomic, strong) NSDate *triggerLastRun;
+@property (nonatomic, strong) NSString *triggerName;
+@property (nonatomic, strong) NSString *triggerTemplate;
+@property (nonatomic, strong) NSString *triggerIdentifier;
+@property (nonatomic, strong) NSString *triggerDescription;
 
 -(VeraSceneTrigger*)initWithDictionary:(NSDictionary*)dictionary;
 
--(void)runSceneCompletion:(void(^)())callback;
--(void)SceneOffCompletion:(void(^)())callback;
+-(NSDictionary*)triggerDictionary;
+
+@end
+
+@interface VeraSceneTriggerArgument : NSObject
+
+@property (nonatomic, strong) NSString *argumentIdentifier;
+@property (nonatomic, strong) NSString *argumentValue;
+@property (nonatomic, strong) NSString *argumentDescription;
+
+@property (nonatomic, strong) NSArray *argumentAllowedValues;
 
 @end

@@ -11,6 +11,7 @@
 @class ZwaveLock;
 @class ZwaveHumiditySensor;
 @class ZwaveThermostat;
+@class VeraScene;
 
 #import <Foundation/Foundation.h>
 
@@ -32,7 +33,7 @@
 @property (nonatomic, strong) NSString *miosUsername;
 @property (nonatomic, strong) NSString *miosPassword;
 
-//These arrays will be automatically populated by running the refreshDevices or refreshDeviceExtended methods
+//These arrays will be automatically populated by running the refreshDevices methods
 @property (nonatomic, strong) NSArray *rooms;
 @property (nonatomic, strong) NSArray *scenes;
 @property (nonatomic, strong) NSArray *switches;
@@ -56,9 +57,11 @@
 //The refreshDevice commands polls the device and build a list of all devices.
 -(void)refreshDevices;
 
-
 //Will automatically run refreshDevices at a specified period.
 -(void)startHeartbeat;
 -(void)stopHeartbeat;
+
+//This returns an empty scene for scene creation
+-(VeraScene*)getEmptyScene;
 
 @end

@@ -19,6 +19,7 @@
 
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback;
 
--(void)getDeviceTriggers:(void(^)(NSArray *triggers))callback;
-    
+-(void)getSceneActionFactories:(void(^)(NSArray *actions))callback;
+-(void)getSceneTriggerFactories:(void(^)(NSArray *triggers))callback;
+
 @end

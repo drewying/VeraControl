@@ -35,4 +35,13 @@
     return self;
 }
 
+-(void)setArmed:(BOOL)armed completion:(void(^)())callback{
+    [self performAction:[NSString stringWithFormat:@"SetArmed&newArmedValue=%i",(armed == YES)] usingService:UPNP_SERVICE_SENSOR_SECURITY completion:^(NSURLResponse *response, NSData *data, NSError *error){
+        self.armed = armed;
+        if (callback){
+            callback();
+        }
+    }];
+}
+
 @end

@@ -17,5 +17,6 @@
 @property (nonatomic, assign) BOOL armed;
 
 -(ZwaveSecuritySensor*)initWithDictionary:(NSDictionary*)dictionary;
+-(void)setArmed:(BOOL)armed completion:(void(^)())callback;
 
 @end

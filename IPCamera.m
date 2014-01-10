@@ -51,7 +51,9 @@
         if (responseString.length > 1){
             NSURL *videoStreamUrl = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@%@", self.username, self.password, responseString, self.videoUrl]];
             if (callback){
-                callback(videoStreamUrl);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    callback(videoStreamUrl);
+                });
             }
         }
     }];
@@ -68,7 +70,9 @@
                 [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:snapshotUrl] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
                     UIImage *image = [UIImage imageWithData:data];
                     if (callback){
-                        callback(image);
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            callback(image);
+                        });
                     }
                 }];
                 

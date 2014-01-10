@@ -1,57 +1,51 @@
 //
 //  VeraSceneTrigger.m
-//  C2
+//  Home
 //
-//  Created by Drew Ingebretsen on 9/22/13.
-//  Copyright (c) 2013 People Tech. All rights reserved.
+//  Created by Drew Ingebretsen on 12/19/13.
+//  Copyright (c) 2013 PeopleTech. All rights reserved.
 //
 
 #import "VeraSceneTrigger.h"
 
-#define UPNP_SERVICE_SCENE @"urn:micasaverde-com:serviceId:HomeAutomationGateway1"
-
-//Sample request - http://ip_address:3480/data_request?id=lu_action&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&action=RunScene&SceneNum=
-
 @implementation VeraSceneTrigger
+
 
 
 -(VeraSceneTrigger*)initWithDictionary:(NSDictionary*)dictionary{
     self = [super init];
     if (self){
-        self.identifier = [NSString stringWithFormat:@"%i", [dictionary[@"id"] integerValue]];
-        self.name = dictionary[@"name"];
-        self.sceneNum = dictionary[@"id"];
-        self.room = [NSString stringWithFormat:@"%@",dictionary[@"room"]];
+        self.triggerDevice = dictionary[@"device"];
+        self.triggerEnabled = [NSNumber numberWithInteger:[dictionary[@"enabled"] integerValue]];
+        self.triggerLastRun = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"last_run"] integerValue]];
+        self.triggerName = dictionary[@"name"];
+        self.triggerTemplate = dictionary[@"template"];
+        
+        self.triggerArguments = @[];
+        for (NSDictionary *argumentDictionary in dictionary[@"arguments"]){
+            VeraSceneTriggerArgument *argument = [[VeraSceneTriggerArgument alloc] init];
+            argument.argumentValue = argumentDictionary[@"value"];
+            argument.argumentIdentifier = argumentDictionary[@"id"];
+        }
     }
     return self;
 }
 
--(void)performAction:(NSString*)action usingService:(NSString*)service onScene:(NSString*)sceneNum completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{
+-(NSDictionary*)triggerDictionary{
+    NSMutableArray *arguments = [[NSMutableArray alloc] init];
+    VeraSceneTriggerArgument *arg = [self.triggerArguments firstObject];
+    //for (VeraSceneTriggerArgument *arg in self.triggerArguments){
+    [arguments addObject:@{@"id":arg.argumentIdentifier, @"value":arg.argumentValue}];
+    //}
     
-    NSString *htmlString = [NSString stringWithFormat:@"%@/data_request?id=action&output_format=json&serviceId=%@&action=%@&SceneNum=%@", self.controllerUrl, service, action, sceneNum];
-    
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
-        if (callback){
-            callback(response, data, error);
-        }
-    }];
+    return @{@"name":self.triggerName, @"enabled":[NSNumber numberWithInteger:self.triggerEnabled], @"template":@([self.triggerTemplate integerValue]), @"device":@([self.triggerDevice integerValue]), @"arguments":arguments};
 }
 
--(void)runSceneCompletion:(void(^)())callback {
-    [self performAction:@"RunScene" usingService:UPNP_SERVICE_SCENE onScene:self.sceneNum completion:^(NSURLResponse *response, NSData *data, NSError *error){
-        if (callback){
-            callback();
-        }
-    }];
-    
+-(NSString*)description{
+    return @"new_trigger_test";
 }
+@end
 
--(void)SceneOffCompletion:(void(^)())callback {
-    [self performAction:@"SceneOff" usingService:UPNP_SERVICE_SCENE onScene:self.sceneNum completion:^(NSURLResponse *response, NSData *data, NSError *error){
-        if (callback){
-            callback();
-        }
-    }];
-}
+@implementation VeraSceneTriggerArgument
 
 @end
