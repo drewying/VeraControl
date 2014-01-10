@@ -12,15 +12,19 @@
 
 @implementation ZwaveNode
 
--(ZwaveNode*)initWithDictionary:(NSDictionary*)dictionary{
+-(id)initWithDictionary:(NSDictionary*)dictionary{
     self = [super init];
     if (self){
         self.identifier = dictionary[@"id"];
-        self.name = dictionary[@"name"];
-        self.veraDeviceFileName = [dictionary[@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
-        self.room = dictionary[@"room"];
+        [self updateWithDictionary:dictionary];
     }
     return self;
+}
+
+-(void)updateWithDictionary:(NSDictionary *)dictionary {
+    self.name = dictionary[@"name"];
+    self.veraDeviceFileName = [dictionary[@"device_file"] stringByReplacingOccurrencesOfString:@"xml" withString:@"json"];
+    self.room = dictionary[@"room"];
 }
 
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback{

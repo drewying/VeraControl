@@ -16,8 +16,6 @@
 @property (nonatomic, assign) BOOL locked;
 @property (nonatomic, strong) NSArray *pinCodes;
 
--(ZwaveLock*)initWithDictionary:(NSDictionary*)dictionary;
-
 -(void)setLocked:(BOOL)locked completion:(void(^)())callback;
 -(void)createPin:(NSString*)pin withName:(NSString*)name completion:(void(^)())callback;
 -(void)setPinValidity:(NSInteger)pinIndex fromDate:(NSDate*)fromDate toDate:(NSDate*)toDate completion:(void(^)())callback;

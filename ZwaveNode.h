@@ -15,7 +15,8 @@
 @property (nonatomic, strong) NSString *controllerUrl;
 @property (nonatomic, strong) NSString *veraDeviceFileName;
 
--(ZwaveNode*)initWithDictionary:(NSDictionary*)dictionary;
+-(id)initWithDictionary:(NSDictionary*)dictionary;
+-(void)updateWithDictionary:(NSDictionary*)dictionary; //This method should be extended by subclasses to update specific parameters of the device.
 
 -(void)performAction:(NSString*)action usingService:(NSString*)service completion:(void(^)(NSURLResponse *response, NSData *data, NSError *devices))callback;
 

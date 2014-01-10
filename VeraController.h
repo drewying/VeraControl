@@ -34,31 +34,34 @@
 @property (nonatomic, strong) NSString *miosPassword;
 
 //These arrays will be automatically populated by running the refreshDevices methods
-@property (nonatomic, strong) NSArray *rooms;
-@property (nonatomic, strong) NSArray *scenes;
-@property (nonatomic, strong) NSArray *switches;
-@property (nonatomic, strong) NSArray *locks;
-@property (nonatomic, strong) NSArray *dimmerSwitches;
-@property (nonatomic, strong) NSArray *securitySensors;
-@property (nonatomic, strong) NSArray *thermostats;
-@property (nonatomic, strong) NSArray *hueBulbs;
-@property (nonatomic, strong) NSArray *ipCameras;
+@property (nonatomic, readonly) NSArray *rooms;
+@property (nonatomic, readonly) NSArray *scenes;
+@property (nonatomic, readonly) NSArray *switches;
+@property (nonatomic, readonly) NSArray *locks;
+@property (nonatomic, readonly) NSArray *dimmerSwitches;
+@property (nonatomic, readonly) NSArray *securitySensors;
+@property (nonatomic, readonly) NSArray *thermostats;
+@property (nonatomic, readonly) NSArray *hueBulbs;
+@property (nonatomic, readonly) NSArray *ipCameras;
+
+//These dictionaries store the rooms and devices by id so that they can later be referenced.
+@property (nonatomic, strong) NSMutableDictionary *roomsDictionary;
+@property (nonatomic, strong) NSMutableDictionary *deviceDictionary;
 
 //These values will be automatically found by running the findVeraController method. I'm keeping them public for manual override if needed
 @property (nonatomic, strong) NSString *ipAddress;
 @property (nonatomic, strong) NSString *veraSerialNumber;
-
 @property (nonatomic, assign) BOOL useMiosRemoteService;
 @property (nonatomic, strong) NSString *miosHostname;
 
 //Discovery
 -(void)findVeraController;
 
-//The refreshDevice commands polls the device and build a list of all devices.
+//The refreshDevice commands polls the device and builds a list of all devices.
 -(void)refreshDevices;
 
 //Will automatically run refreshDevices at a specified period.
--(void)startHeartbeat;
+-(void)startHeartbeatWithInterval:(NSInteger)interval;
 -(void)stopHeartbeat;
 
 //This returns an empty scene for scene creation

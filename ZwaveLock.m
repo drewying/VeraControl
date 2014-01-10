@@ -12,8 +12,8 @@
 
 @implementation ZwaveLock
 
--(ZwaveLock*)initWithDictionary:(NSDictionary*)dictionary{
-    self = [super initWithDictionary:dictionary];
+-(void)updateWithDictionary:(NSDictionary *)dictionary {
+    [super updateWithDictionary:dictionary];
     if (self){
         for (NSDictionary *serviceDictionary in dictionary[@"states"]){
             NSString *service = serviceDictionary[@"service"];
@@ -47,7 +47,6 @@
             }
         }
     }
-    return self;
 }
 
 -(void)setLocked:(BOOL)locked completion:(void(^)())callback{
@@ -58,23 +57,11 @@
     }];
 }
 
-//<VERSION=3>73	1,1,2013-08-12 23:30:56,2013-10-07 11:42:07,****,Drew;	2,1,,2013-12-18 21:32:25,****,Master;	3,1,2013-09-03 23:23:28,,****,Shanon;	4,0;	5,1,2013-11-15 23:10:54,2013-12-18 19:08:52,****,Arm;	6,1,2013-12-10 21:47:57,,****,Rex;	7,0;	8,0;	9,0;	10,0;	11,0;	12,0;	13,0;	14,0;	15,0;	16,0;	17,0;	18,0;	19,0;
-
-//http://192.168.81.1:3480/data_request?id=action&DeviceNum=6&serviceId=urn:micasaverde-com:serviceId:DoorLock1&action=SetPinValidityDate&UserCode=1&StartDate=2012-09-03%2014:00:00&StopDate=2012-09-03%2015:00:00&Replace=1
 
 -(void)createPin:(NSString*)pin withName:(NSString*)name completion:(void(^)())callback{
-    NSInteger lastIndex = [[[self.pinCodes lastObject] valueForKey:@"pinIndex"] integerValue];
+    //NSInteger lastIndex = [[[self.pinCodes lastObject] valueForKey:@"pinIndex"] integerValue];
     
-    NSLog(@"%@",[NSString stringWithFormat:@"SetPin&UserCodeName=%@&newPin=%@&user=%@", [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], pin, [NSString stringWithFormat:@"%i", lastIndex+1]]);
-    
-    /*
-     [self performAction:[NSString stringWithFormat:@"SetPin&UserCodeName=%@&newPin=%@&user=%@", [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], pin, [NSString stringWithFormat:@"%i", lastIndex+1]] usingService:UPNP_SERVICE_DOOR_LOCK completion:^(NSURLResponse *response, NSData *data, NSError *error){
-     NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-     if (callback){
-     callback();
-     }
-     }];
-     */
+    //NSLog(@"%@",[NSString stringWithFormat:@"SetPin&UserCodeName=%@&newPin=%@&user=%@", [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], pin, [NSString stringWithFormat:@"%i", lastIndex+1]]);
     
     [self performAction:[NSString stringWithFormat:@"SetPin&UserCodeName=%@&newPin=%@", [name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], pin] usingService:UPNP_SERVICE_DOOR_LOCK completion:^(NSURLResponse *response, NSData *data, NSError *error){
         NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
