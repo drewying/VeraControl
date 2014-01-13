@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 People Tech. All rights reserved.
 //
 
-#import "ZwavePhillipsHueBulb.h"
+#import "PhillipsHueBulb.h"
 
-@implementation ZwavePhillipsHueBulb
+@implementation PhillipsHueBulb
 
 #define UPNP_SERVICE_PHILLIPS_HUE_BULB @"urn:intvelt-com:serviceId:HueColors1"
 

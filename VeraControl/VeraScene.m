@@ -71,8 +71,9 @@
     NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
     [dictionary setObject:self.name forKey:@"name"];
     [dictionary setObject:triggers forKey:@"triggers"];
-    //[dictionary setObject:actions forKey:@"groups"];
-    [dictionary setObject:@0 forKey:@"room"];
+    [dictionary setObject:actions forKey:@"groups"];
+    [dictionary setObject:@[] forKey:@"timers"];
+    [dictionary setObject:@1 forKey:@"room"];
     
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:nil];
     

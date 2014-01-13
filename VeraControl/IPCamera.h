@@ -19,8 +19,6 @@
 @property (nonatomic, strong) NSString *username;
 @property (nonatomic, strong) NSString *password;
 
--(IPCamera*)initWithDictionary:(NSDictionary*)dictionary;
-
 -(void)getVideoFeedURL:(void (^)(NSURL *url))callback;
 -(void)getSnapshot:(void (^)(UIImage *image))callback;
 -(void)moveUp;

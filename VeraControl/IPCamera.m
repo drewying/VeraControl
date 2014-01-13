@@ -13,34 +13,30 @@
 
 @implementation IPCamera
 
--(IPCamera*)initWithDictionary:(NSDictionary*)dictionary{
-    self = [super initWithDictionary:dictionary];
-    if (self){
-        self.username = [dictionary objectForKey:@"username"];
-        self.password = [dictionary objectForKey:@"password"];
-        self.ipAddress = [dictionary objectForKey:@"ipaddress"];
-        
-        for (NSDictionary *serviceDictionary in dictionary[@"states"]){
-            NSString *service = serviceDictionary[@"service"];
-            if ([service isEqualToString:UPNP_SERVICE_CAMERA]){
-                NSString *variable = serviceDictionary[@"variable"];
-                if ([variable isEqualToString:@"URL"]){
-                    self.snapshotUrl = serviceDictionary[@"value"];
-                }
-                if ([variable isEqualToString:@"DirectStreamingURL"]){
-                    self.videoUrl = serviceDictionary[@"value"];
-                }
-                if ([variable isEqualToString:@"Commands"]){
-                    NSString *commandString = serviceDictionary[@"value"];
-                    if ([commandString hasPrefix:@"camera_up"]){
-                        self.canPan = YES;
-                    }
+-(void)updateWithDictionary:(NSDictionary*)dictionary{
+    [super updateWithDictionary:dictionary];
+    self.username = [dictionary objectForKey:@"username"];
+    self.password = [dictionary objectForKey:@"password"];
+    self.ipAddress = [dictionary objectForKey:@"ip"];
+    
+    for (NSDictionary *serviceDictionary in dictionary[@"states"]){
+        NSString *service = serviceDictionary[@"service"];
+        if ([service isEqualToString:UPNP_SERVICE_CAMERA]){
+            NSString *variable = serviceDictionary[@"variable"];
+            if ([variable isEqualToString:@"URL"]){
+                self.snapshotUrl = serviceDictionary[@"value"];
+            }
+            if ([variable isEqualToString:@"DirectStreamingURL"]){
+                self.videoUrl = serviceDictionary[@"value"];
+            }
+            if ([variable isEqualToString:@"Commands"]){
+                NSString *commandString = serviceDictionary[@"value"];
+                if ([commandString hasPrefix:@"camera_up"]){
+                    self.canPan = YES;
                 }
             }
         }
-
     }
-    return self;
 }
 
 -(void)getVideoFeedURL:(void (^)(NSURL *url))callback{
@@ -50,6 +46,7 @@
         NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if (responseString.length > 1){
             NSURL *videoStreamUrl = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@%@", self.username, self.password, responseString, self.videoUrl]];
+            //NSURL *videoStreamUrl = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@%@", self.username, self.password, self.ipAddress, self.videoUrl]];
             if (callback){
                 dispatch_async(dispatch_get_main_queue(), ^{
                     callback(videoStreamUrl);

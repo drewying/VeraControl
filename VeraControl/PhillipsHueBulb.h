@@ -9,7 +9,7 @@
 #import "ZwaveNode.h"
 
 
-@interface ZwavePhillipsHueBulb : ZwaveNode
+@interface PhillipsHueBulb : ZwaveNode
 
 #define UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB @"urn:schemas-intvelt-com:device:HueLamp:1"
 

@@ -13,7 +13,7 @@
 #import "ZWaveThermostat.h"
 #import "ZWaveHumiditySensor.h"
 #import "ZwaveSecuritySensor.h"
-#import "ZwavePhillipsHueBulb.h"
+#import "PhillipsHueBulb.h"
 #import "IPCamera.h"
 #import "VeraRoom.h"
 #import "VeraScene.h"
@@ -219,7 +219,7 @@ static VeraController *sharedInstance;
                     }
                     
                     if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB]){
-                        device = [[ZwavePhillipsHueBulb alloc] initWithDictionary:deviceData];
+                        device = [[PhillipsHueBulb alloc] initWithDictionary:deviceData];
                         self.hueBulbs = [self.hueBulbs arrayByAddingObject:device];
                     }
                     
@@ -291,7 +291,7 @@ static VeraController *sharedInstance;
 -(VeraScene*)getEmptyScene{
     VeraScene *scene = [[VeraScene alloc] init];
     scene.controllerUrl = [self controlUrl];
-    scene.name = @"Test Scene";
+    scene.name = @"New Scene";
     scene.triggers = @[];
     scene.actions = @[];
     scene.schedules = @[];

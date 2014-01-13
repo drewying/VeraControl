@@ -1,0 +1,524 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D40D232B188123C200041A9C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40D232A188123C200041A9C /* Foundation.framework */; };
+		D40D2339188123C200041A9C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40D2338188123C200041A9C /* XCTest.framework */; };
+		D40D233A188123C200041A9C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40D232A188123C200041A9C /* Foundation.framework */; };
+		D40D233C188123C200041A9C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40D233B188123C200041A9C /* UIKit.framework */; };
+		D40D233F188123C200041A9C /* libVeraControl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D40D2327188123C200041A9C /* libVeraControl.a */; };
+		D40D2345188123C200041A9C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D40D2343188123C200041A9C /* InfoPlist.strings */; };
+		D40D2347188123C200041A9C /* VeraControlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D2346188123C200041A9C /* VeraControlTests.m */; };
+		D40D23A7188125EF00041A9C /* IPCamera.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D238A188125EF00041A9C /* IPCamera.m */; };
+		D40D23A8188125EF00041A9C /* VeraController.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D238C188125EF00041A9C /* VeraController.m */; };
+		D40D23A9188125EF00041A9C /* VeraRoom.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D238E188125EF00041A9C /* VeraRoom.m */; };
+		D40D23AA188125EF00041A9C /* VeraScene.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D2390188125EF00041A9C /* VeraScene.m */; };
+		D40D23AB188125EF00041A9C /* VeraSceneAction.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D2392188125EF00041A9C /* VeraSceneAction.m */; };
+		D40D23AC188125EF00041A9C /* VeraSceneTrigger.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D2394188125EF00041A9C /* VeraSceneTrigger.m */; };
+		D40D23AD188125EF00041A9C /* VeraSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D2396188125EF00041A9C /* VeraSchedule.m */; };
+		D40D23AE188125EF00041A9C /* ZwaveDimmerSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D2398188125EF00041A9C /* ZwaveDimmerSwitch.m */; };
+		D40D23AF188125EF00041A9C /* ZwaveHumiditySensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D239A188125EF00041A9C /* ZwaveHumiditySensor.m */; };
+		D40D23B0188125EF00041A9C /* ZwaveLock.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D239C188125EF00041A9C /* ZwaveLock.m */; };
+		D40D23B1188125EF00041A9C /* ZwaveNode.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D239E188125EF00041A9C /* ZwaveNode.m */; };
+		D40D23B2188125EF00041A9C /* PhillipsHueBulb.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D23A0188125EF00041A9C /* PhillipsHueBulb.m */; };
+		D40D23B3188125EF00041A9C /* ZwaveSecuritySensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D23A2188125EF00041A9C /* ZwaveSecuritySensor.m */; };
+		D40D23B4188125EF00041A9C /* ZwaveSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D23A4188125EF00041A9C /* ZwaveSwitch.m */; };
+		D40D23B5188125EF00041A9C /* ZwaveThermostat.m in Sources */ = {isa = PBXBuildFile; fileRef = D40D23A6188125EF00041A9C /* ZwaveThermostat.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D40D233D188123C200041A9C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D40D231F188123C200041A9C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D40D2326188123C200041A9C;
+			remoteInfo = VeraControl;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D40D2325188123C200041A9C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		D40D2327188123C200041A9C /* libVeraControl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libVeraControl.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D40D232A188123C200041A9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D40D232E188123C200041A9C /* VeraControl-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VeraControl-Prefix.pch"; sourceTree = "<group>"; };
+		D40D2337188123C200041A9C /* VeraControlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VeraControlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D40D2338188123C200041A9C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		D40D233B188123C200041A9C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		D40D2342188123C200041A9C /* VeraControlTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "VeraControlTests-Info.plist"; sourceTree = "<group>"; };
+		D40D2344188123C200041A9C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D40D2346188123C200041A9C /* VeraControlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VeraControlTests.m; sourceTree = "<group>"; };
+		D40D2389188125EF00041A9C /* IPCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPCamera.h; sourceTree = "<group>"; };
+		D40D238A188125EF00041A9C /* IPCamera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IPCamera.m; sourceTree = "<group>"; };
+		D40D238B188125EF00041A9C /* VeraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraController.h; sourceTree = "<group>"; };
+		D40D238C188125EF00041A9C /* VeraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VeraController.m; sourceTree = "<group>"; };
+		D40D238D188125EF00041A9C /* VeraRoom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraRoom.h; sourceTree = "<group>"; };
+		D40D238E188125EF00041A9C /* VeraRoom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VeraRoom.m; sourceTree = "<group>"; };
+		D40D238F188125EF00041A9C /* VeraScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraScene.h; sourceTree = "<group>"; };
+		D40D2390188125EF00041A9C /* VeraScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VeraScene.m; sourceTree = "<group>"; };
+		D40D2391188125EF00041A9C /* VeraSceneAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraSceneAction.h; sourceTree = "<group>"; };
+		D40D2392188125EF00041A9C /* VeraSceneAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VeraSceneAction.m; sourceTree = "<group>"; };
+		D40D2393188125EF00041A9C /* VeraSceneTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraSceneTrigger.h; sourceTree = "<group>"; };
+		D40D2394188125EF00041A9C /* VeraSceneTrigger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VeraSceneTrigger.m; sourceTree = "<group>"; };
+		D40D2395188125EF00041A9C /* VeraSchedule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraSchedule.h; sourceTree = "<group>"; };
+		D40D2396188125EF00041A9C /* VeraSchedule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VeraSchedule.m; sourceTree = "<group>"; };
+		D40D2397188125EF00041A9C /* ZwaveDimmerSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZwaveDimmerSwitch.h; sourceTree = "<group>"; };
+		D40D2398188125EF00041A9C /* ZwaveDimmerSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZwaveDimmerSwitch.m; sourceTree = "<group>"; };
+		D40D2399188125EF00041A9C /* ZwaveHumiditySensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZwaveHumiditySensor.h; sourceTree = "<group>"; };
+		D40D239A188125EF00041A9C /* ZwaveHumiditySensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZwaveHumiditySensor.m; sourceTree = "<group>"; };
+		D40D239B188125EF00041A9C /* ZwaveLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZwaveLock.h; sourceTree = "<group>"; };
+		D40D239C188125EF00041A9C /* ZwaveLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZwaveLock.m; sourceTree = "<group>"; };
+		D40D239D188125EF00041A9C /* ZwaveNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZwaveNode.h; sourceTree = "<group>"; };
+		D40D239E188125EF00041A9C /* ZwaveNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZwaveNode.m; sourceTree = "<group>"; };
+		D40D239F188125EF00041A9C /* PhillipsHueBulb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhillipsHueBulb.h; sourceTree = "<group>"; };
+		D40D23A0188125EF00041A9C /* PhillipsHueBulb.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhillipsHueBulb.m; sourceTree = "<group>"; };
+		D40D23A1188125EF00041A9C /* ZwaveSecuritySensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZwaveSecuritySensor.h; sourceTree = "<group>"; };
+		D40D23A2188125EF00041A9C /* ZwaveSecuritySensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZwaveSecuritySensor.m; sourceTree = "<group>"; };
+		D40D23A3188125EF00041A9C /* ZwaveSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZwaveSwitch.h; sourceTree = "<group>"; };
+		D40D23A4188125EF00041A9C /* ZwaveSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZwaveSwitch.m; sourceTree = "<group>"; };
+		D40D23A5188125EF00041A9C /* ZwaveThermostat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZwaveThermostat.h; sourceTree = "<group>"; };
+		D40D23A6188125EF00041A9C /* ZwaveThermostat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZwaveThermostat.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D40D2324188123C200041A9C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D40D232B188123C200041A9C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D40D2334188123C200041A9C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D40D2339188123C200041A9C /* XCTest.framework in Frameworks */,
+				D40D233F188123C200041A9C /* libVeraControl.a in Frameworks */,
+				D40D233C188123C200041A9C /* UIKit.framework in Frameworks */,
+				D40D233A188123C200041A9C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D40D231E188123C200041A9C = {
+			isa = PBXGroup;
+			children = (
+				D40D232C188123C200041A9C /* VeraControl */,
+				D40D2340188123C200041A9C /* VeraControlTests */,
+				D40D2329188123C200041A9C /* Frameworks */,
+				D40D2328188123C200041A9C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D40D2328188123C200041A9C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D40D2327188123C200041A9C /* libVeraControl.a */,
+				D40D2337188123C200041A9C /* VeraControlTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D40D2329188123C200041A9C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D40D232A188123C200041A9C /* Foundation.framework */,
+				D40D2338188123C200041A9C /* XCTest.framework */,
+				D40D233B188123C200041A9C /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D40D232C188123C200041A9C /* VeraControl */ = {
+			isa = PBXGroup;
+			children = (
+				D40D23B71881260C00041A9C /* Scenes */,
+				D40D23B6188125F700041A9C /* Devices */,
+				D40D238B188125EF00041A9C /* VeraController.h */,
+				D40D238C188125EF00041A9C /* VeraController.m */,
+				D40D232D188123C200041A9C /* Supporting Files */,
+			);
+			path = VeraControl;
+			sourceTree = "<group>";
+		};
+		D40D232D188123C200041A9C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D40D232E188123C200041A9C /* VeraControl-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D40D2340188123C200041A9C /* VeraControlTests */ = {
+			isa = PBXGroup;
+			children = (
+				D40D2346188123C200041A9C /* VeraControlTests.m */,
+				D40D2341188123C200041A9C /* Supporting Files */,
+			);
+			path = VeraControlTests;
+			sourceTree = "<group>";
+		};
+		D40D2341188123C200041A9C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D40D2342188123C200041A9C /* VeraControlTests-Info.plist */,
+				D40D2343188123C200041A9C /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D40D23B6188125F700041A9C /* Devices */ = {
+			isa = PBXGroup;
+			children = (
+				D40D2397188125EF00041A9C /* ZwaveDimmerSwitch.h */,
+				D40D2398188125EF00041A9C /* ZwaveDimmerSwitch.m */,
+				D40D2399188125EF00041A9C /* ZwaveHumiditySensor.h */,
+				D40D239A188125EF00041A9C /* ZwaveHumiditySensor.m */,
+				D40D239B188125EF00041A9C /* ZwaveLock.h */,
+				D40D239C188125EF00041A9C /* ZwaveLock.m */,
+				D40D239D188125EF00041A9C /* ZwaveNode.h */,
+				D40D239E188125EF00041A9C /* ZwaveNode.m */,
+				D40D239F188125EF00041A9C /* PhillipsHueBulb.h */,
+				D40D23A0188125EF00041A9C /* PhillipsHueBulb.m */,
+				D40D23A1188125EF00041A9C /* ZwaveSecuritySensor.h */,
+				D40D23A2188125EF00041A9C /* ZwaveSecuritySensor.m */,
+				D40D23A3188125EF00041A9C /* ZwaveSwitch.h */,
+				D40D23A4188125EF00041A9C /* ZwaveSwitch.m */,
+				D40D23A5188125EF00041A9C /* ZwaveThermostat.h */,
+				D40D23A6188125EF00041A9C /* ZwaveThermostat.m */,
+				D40D2389188125EF00041A9C /* IPCamera.h */,
+				D40D238A188125EF00041A9C /* IPCamera.m */,
+			);
+			name = Devices;
+			sourceTree = "<group>";
+		};
+		D40D23B71881260C00041A9C /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				D40D238D188125EF00041A9C /* VeraRoom.h */,
+				D40D238E188125EF00041A9C /* VeraRoom.m */,
+				D40D238F188125EF00041A9C /* VeraScene.h */,
+				D40D2390188125EF00041A9C /* VeraScene.m */,
+				D40D2391188125EF00041A9C /* VeraSceneAction.h */,
+				D40D2392188125EF00041A9C /* VeraSceneAction.m */,
+				D40D2393188125EF00041A9C /* VeraSceneTrigger.h */,
+				D40D2394188125EF00041A9C /* VeraSceneTrigger.m */,
+				D40D2395188125EF00041A9C /* VeraSchedule.h */,
+				D40D2396188125EF00041A9C /* VeraSchedule.m */,
+			);
+			name = Scenes;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D40D2326188123C200041A9C /* VeraControl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D40D234A188123C200041A9C /* Build configuration list for PBXNativeTarget "VeraControl" */;
+			buildPhases = (
+				D40D2323188123C200041A9C /* Sources */,
+				D40D2324188123C200041A9C /* Frameworks */,
+				D40D2325188123C200041A9C /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VeraControl;
+			productName = VeraControl;
+			productReference = D40D2327188123C200041A9C /* libVeraControl.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		D40D2336188123C200041A9C /* VeraControlTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D40D234D188123C200041A9C /* Build configuration list for PBXNativeTarget "VeraControlTests" */;
+			buildPhases = (
+				D40D2333188123C200041A9C /* Sources */,
+				D40D2334188123C200041A9C /* Frameworks */,
+				D40D2335188123C200041A9C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D40D233E188123C200041A9C /* PBXTargetDependency */,
+			);
+			name = VeraControlTests;
+			productName = VeraControlTests;
+			productReference = D40D2337188123C200041A9C /* VeraControlTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D40D231F188123C200041A9C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = PeopleTech;
+			};
+			buildConfigurationList = D40D2322188123C200041A9C /* Build configuration list for PBXProject "VeraControl" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D40D231E188123C200041A9C;
+			productRefGroup = D40D2328188123C200041A9C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D40D2326188123C200041A9C /* VeraControl */,
+				D40D2336188123C200041A9C /* VeraControlTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D40D2335188123C200041A9C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D40D2345188123C200041A9C /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D40D2323188123C200041A9C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D40D23B0188125EF00041A9C /* ZwaveLock.m in Sources */,
+				D40D23A9188125EF00041A9C /* VeraRoom.m in Sources */,
+				D40D23AC188125EF00041A9C /* VeraSceneTrigger.m in Sources */,
+				D40D23AB188125EF00041A9C /* VeraSceneAction.m in Sources */,
+				D40D23B1188125EF00041A9C /* ZwaveNode.m in Sources */,
+				D40D23AE188125EF00041A9C /* ZwaveDimmerSwitch.m in Sources */,
+				D40D23B2188125EF00041A9C /* PhillipsHueBulb.m in Sources */,
+				D40D23B4188125EF00041A9C /* ZwaveSwitch.m in Sources */,
+				D40D23AF188125EF00041A9C /* ZwaveHumiditySensor.m in Sources */,
+				D40D23A7188125EF00041A9C /* IPCamera.m in Sources */,
+				D40D23B3188125EF00041A9C /* ZwaveSecuritySensor.m in Sources */,
+				D40D23AA188125EF00041A9C /* VeraScene.m in Sources */,
+				D40D23A8188125EF00041A9C /* VeraController.m in Sources */,
+				D40D23B5188125EF00041A9C /* ZwaveThermostat.m in Sources */,
+				D40D23AD188125EF00041A9C /* VeraSchedule.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D40D2333188123C200041A9C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D40D2347188123C200041A9C /* VeraControlTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D40D233E188123C200041A9C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D40D2326188123C200041A9C /* VeraControl */;
+			targetProxy = D40D233D188123C200041A9C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D40D2343188123C200041A9C /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D40D2344188123C200041A9C /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D40D2348188123C200041A9C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		D40D2349188123C200041A9C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D40D234B188123C200041A9C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/VeraControl.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "VeraControl/VeraControl-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		D40D234C188123C200041A9C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/VeraControl.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "VeraControl/VeraControl-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		D40D234E188123C200041A9C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "VeraControl/VeraControl-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "VeraControlTests/VeraControlTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		D40D234F188123C200041A9C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "VeraControl/VeraControl-Prefix.pch";
+				INFOPLIST_FILE = "VeraControlTests/VeraControlTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D40D2322188123C200041A9C /* Build configuration list for PBXProject "VeraControl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D40D2348188123C200041A9C /* Debug */,
+				D40D2349188123C200041A9C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D40D234A188123C200041A9C /* Build configuration list for PBXNativeTarget "VeraControl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D40D234B188123C200041A9C /* Debug */,
+				D40D234C188123C200041A9C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D40D234D188123C200041A9C /* Build configuration list for PBXNativeTarget "VeraControlTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D40D234E188123C200041A9C /* Debug */,
+				D40D234F188123C200041A9C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D40D231F188123C200041A9C /* Project object */;
+}
