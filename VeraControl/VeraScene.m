@@ -40,7 +40,9 @@
     
     [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:htmlString]] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         if (callback){
-            callback(response, data, error);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback(response, data, error);
+            });
         }
     }];
 }
@@ -48,7 +50,9 @@
 -(void)runSceneCompletion:(void(^)())callback {
     [self performAction:@"RunScene" usingService:UPNP_SERVICE_SCENE onScene:self.sceneNum completion:^(NSURLResponse *response, NSData *data, NSError *error){
         if (callback){
-            callback();
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback();
+            });
         }
     }];
     
@@ -57,7 +61,9 @@
 -(void)SceneOffCompletion:(void(^)())callback {
     [self performAction:@"SceneOff" usingService:UPNP_SERVICE_SCENE onScene:self.sceneNum completion:^(NSURLResponse *response, NSData *data, NSError *error){
         if (callback){
-            callback();
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback();
+            });
         }
     }];
 }
@@ -73,12 +79,8 @@
     [dictionary setObject:triggers forKey:@"triggers"];
     [dictionary setObject:actions forKey:@"groups"];
     [dictionary setObject:@[] forKey:@"timers"];
-    [dictionary setObject:@1 forKey:@"room"];
     
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:nil];
-    
-    NSLog(@"JSON:%@", [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
-    
     NSString *string = [NSString stringWithFormat:@"json=%@", [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]];
     
     jsonData = [string dataUsingEncoding:NSUTF8StringEncoding];
@@ -88,12 +90,12 @@
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:htmlString]];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:jsonData];
-    
-    
     [NSURLConnection sendAsynchronousRequest:request queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         if (callback){
             NSLog(@"Response:%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            callback(response, data, error);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback(response, data, error);
+            });
         }
     }];
 }

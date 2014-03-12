@@ -16,7 +16,7 @@
 #define THERMO_MODE_COOL_ONLY @"CoolOn"
 #define THERMO_MODE_HEAT_ONLY @"HeatOn"
 
-
+#define UPNP_DEVICE_TYPE_THERMOSTAT @"urn:schemas-upnp-org:device:HVAC_ZoneThermostat:1"
 #define UPNP_DEVICE_TYPE_NEST_THERMOSTAT @"urn:schemas-watou-com:device:HVAC_ZoneThermostat:1"
 
 @interface ZwaveThermostat : ZwaveNode

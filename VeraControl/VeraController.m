@@ -37,22 +37,18 @@
 
 @implementation VeraController
 
-static VeraController *sharedInstance;
-
-+(id)sharedController{
-    @synchronized(self) {
-        if (sharedInstance == nil){
-            sharedInstance = [[self alloc] init];
-            sharedInstance.switches = @[];
-            sharedInstance.dimmerSwitches = @[];
-            sharedInstance.locks = @[];
-            sharedInstance.thermostats = @[];
-            sharedInstance.securitySensors = @[];
-            sharedInstance.hueBulbs = @[];
-            sharedInstance.ipCameras = @[];
-        }
+-(id)init{
+    self = [super init];
+    if (self){
+        self.switches = @[];
+        self.dimmerSwitches = @[];
+        self.locks = @[];
+        self.thermostats = @[];
+        self.securitySensors = @[];
+        self.hueBulbs = @[];
+        self.ipCameras = @[];
     }
-    return sharedInstance;
+    return self;
 }
 
 -(void)startHeartbeatWithInterval:(NSInteger)interval{
@@ -69,37 +65,77 @@ static VeraController *sharedInstance;
     [self.heartBeat invalidate];
 }
 
--(void)findVeraController{
-    NSURL *url = [NSURL URLWithString:[self locateUrl]];
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:url] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
++(void)findVeraControllers:(NSString*)miosUsername password:(NSString*)miosPassword completion:(void(^)(NSArray *units, NSError *error))completionBlock{
+    NSString *locateUrl;
+    if (miosUsername.length == 0){
+        locateUrl = [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=user"];
+    }
+    else{
+        locateUrl = [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=%@", miosUsername];
+    }
+
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:locateUrl]] queue:[[NSOperationQueue alloc] init] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
         if (error){
+            NSLog(@"%@", error.localizedDescription);
+            if (completionBlock){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                    completionBlock(nil, error);
+                });
+            }
             return;
         }
         
         NSDictionary *miosLocatorResponse = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
-        NSArray *units = [miosLocatorResponse objectForKey:@"units"];
+        NSArray *units = miosLocatorResponse[@"units"];
         if (units.count > 0){
-            NSDictionary *mainUnit = [units objectAtIndex:0];
-            self.veraSerialNumber = [mainUnit objectForKey:@"serialNumber"];
-            NSString *ipAddress = [mainUnit objectForKey:@"ipAddress"];
-            self.ipAddress = ipAddress;
-            self.miosHostname = [mainUnit objectForKey:@"active_server"];
-            self.useMiosRemoteService = (self.ipAddress.length < 7);
+            NSMutableArray *veraDevices = [[NSMutableArray alloc] init];
+            for (NSDictionary *unitDictionary in units){
+                VeraController *veraController = [[VeraController alloc] init];
+                veraController.veraSerialNumber = unitDictionary[@"serialNumber"];
+                veraController.ipAddress = unitDictionary[@"ipAddress"];
+                veraController.miosUsername = miosUsername;
+                veraController.miosPassword = miosPassword;
+                veraController.miosHostname = unitDictionary[@"active_server"];
+                veraController.useMiosRemoteService = (veraController.ipAddress.length < 7);
+                [veraDevices addObject:veraController];
+            }
+            if (completionBlock){
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionBlock(veraDevices, nil);
+                });
+            }
+            
             [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:nil];
-            [self refreshDevices];
+            
         }
         else {
             //There was an error locating the device, probably due to bad credentials
             [[NSNotificationCenter defaultCenter] postNotificationName:VERA_LOCATE_CONTROLLER_NOTIFICATION object:[NSError errorWithDomain:@"VeraControl - Could not locate Vera Controller" code:50 userInfo:nil]];
         }
     }];
+    
 }
 
--(NSString *)locateUrl{
-    if (self.miosUsername.length == 0)
-        return [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=user"];
+-(void)testReachability:(void(^)(BOOL reachable))completion{
+    if (!completion){
+        return;
+    }
     
-    return [NSString stringWithFormat:@"https://sta1.mios.com/locator_json.php?username=%@", self.miosUsername];
+    [self performCommand:@"id=alive" completion:^(NSURLResponse *response, NSData *data, NSError *error){
+        if (error){
+            completion(NO);
+            return;
+        }
+        
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+        if (httpResponse.statusCode != 200){
+            completion(NO);
+            return;
+        }
+        
+        NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        completion([responseString isEqualToString:@"OK"]);
+    }];
 }
 
 -(NSString *)controlUrl{
@@ -126,165 +162,177 @@ static VeraController *sharedInstance;
     [self performCommand:@"id=user_data" completion:^(NSURLResponse *response, NSData *data, NSError *error){
         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
         
-        if (r.statusCode ==200){
-            NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-            
-            if (error != nil) {
-                //There was an error processing JSON, this happens if username/password is invalid
-                [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:[NSError errorWithDomain:@"VeraControl - Error refreshing devices" code:50 userInfo:error.userInfo]];
-                return;
+        if (r.statusCode !=200){
+            if (!self.useMiosRemoteService){
+                self.useMiosRemoteService = YES;
+                [self refreshDevices];
             }
-            
-            //Gather the rooms
-            NSArray *parsedRooms = responseDictionary[@"rooms"];
-            
-            if (self.roomsDictionary == nil) {
-                self.roomsDictionary = [[NSMutableDictionary alloc] initWithCapacity:(parsedRooms.count+1)];
-                
-                VeraRoom *unassignedRoom = [[VeraRoom alloc] init];
-                unassignedRoom.name = @"Unassigned";
-                unassignedRoom.identifier = @"0";
-                unassignedRoom.section = @"0";
-                
-                [self.roomsDictionary setObject:unassignedRoom forKey:unassignedRoom.identifier];
-            }
-            
-            //Add the unassigned room
-            self.rooms = @[[self.roomsDictionary objectForKey:@"0"]];
-            
-            for (NSDictionary *parsedRoom in parsedRooms){
-                //Check to see if the room exists and update it, if not create one
-                NSString *identifier = [[parsedRoom objectForKey:@"id"] stringValue];
-                VeraRoom *room = self.roomsDictionary[identifier];
-                
-                if (room == nil) {
-                    VeraRoom *room = [[VeraRoom alloc] init];
-                    room.name = [parsedRoom objectForKey:@"name"];
-                    room.identifier = [[parsedRoom objectForKey:@"id"] stringValue];
-                    room.section = [parsedRoom objectForKey:@"section"];
-                    self.rooms = [self.rooms arrayByAddingObject:room];
-                    [self.roomsDictionary setObject:room forKey:room.identifier];
-                }
-                else {
-                    room.name = [parsedRoom objectForKey:@"name"];
-                    room.identifier = [[parsedRoom objectForKey:@"id"] stringValue];
-                    room.section = [parsedRoom objectForKey:@"section"];
-                    
-                    //Clear the devices since we are going to refill it
-                    //TODO: We should create a devices dictionary as well
-                    room.devices = @[];
-                }
-            }
-            
-            //Gather the devices
-            NSArray *devices = responseDictionary[@"devices"];
-            
-            if (self.deviceDictionary == nil) {
-                self.deviceDictionary = [[NSMutableDictionary alloc] initWithCapacity:devices.count];
-            }
-            
-            for (NSDictionary *deviceData in devices){
-                NSString *deviceType = deviceData[@"device_type"];
-                NSString *deviceIdentifier = deviceData[@"id"];
-                
-                ZwaveNode *device = self.deviceDictionary[deviceIdentifier];
-                
-                if (device == nil) {
-                    //Create a new ZWaveNode based on deviceType
-                    
-                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DIMMABLE_SWITCH]){
-                        device = [[ZwaveDimmerSwitch alloc] initWithDictionary:deviceData];
-                        self.dimmerSwitches = [self.dimmerSwitches arrayByAddingObject:device];
-                    }
-                    
-                    
-                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_SWITCH]){
-                        device = [[ZwaveSwitch alloc] initWithDictionary:deviceData];
-                        self.switches = [self.switches arrayByAddingObject:device];
-                    }
-                    
-                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DOOR_LOCK]){
-                        device = [[ZwaveLock alloc] initWithDictionary:deviceData];
-                        self.locks = [self.locks arrayByAddingObject:device];
-                    }
-                    
-                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_NEST_THERMOSTAT]){
-                        device = [[ZwaveThermostat alloc] initWithDictionary:deviceData];
-                        self.thermostats = [self.thermostats arrayByAddingObject:device];
-                    }
-                    
-                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_MOTION_SENSOR]){
-                        device = [[ZwaveSecuritySensor alloc] initWithDictionary:deviceData];
-                        self.securitySensors = [self.securitySensors arrayByAddingObject:device];
-                    }
-                    
-                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB]){
-                        device = [[PhillipsHueBulb alloc] initWithDictionary:deviceData];
-                        self.hueBulbs = [self.hueBulbs arrayByAddingObject:device];
-                    }
-                    
-                    if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_IP_CAMERA]){
-                        device = [[IPCamera alloc] initWithDictionary:deviceData];
-                        self.ipCameras = [self.ipCameras arrayByAddingObject:device];
-                    }
-                    
-                    if (device)
-                        [self.deviceDictionary setObject:device forKey:deviceIdentifier];
-                }
-                
-                else {
-                    //Update the device
-                    [device updateWithDictionary:deviceData];
-                }
-                
-                //Add the device to the room
-                if (device){
-                    device.controllerUrl = [self controlUrl];
-                    VeraRoom *room = [self.roomsDictionary objectForKey:device.room];
-                    NSAssert((room != nil), @"Room does not exist - %@", device.room);
-                    
-                    //Scan the array to see if the device is already added to the room
-                    //TODO: This might make sense being a dictionary as well. Also need to deal with device being removed from a room.
-                    NSArray *array = [room.devices filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", device.identifier]];
-                    if (array.count == 0){
-                        //Device not found, add it
-                        room.devices = [room.devices arrayByAddingObject:device];
-                    }
-
-                }
-            }
-            
-            
-            //Get Scenes
-            self.scenes = @[];
-            
-            //Clear all the room scenes
-            //TODO: Make scenes an updateable dictionary like rooms and devices
-            for (id roomid in self.roomsDictionary) {
-                VeraRoom *room = [self.roomsDictionary objectForKey:roomid];
-                room.scenes = @[];
-            }
-            
-            NSArray *scenes = responseDictionary[@"scenes"];
-            for (NSDictionary *dictionary in scenes){
-                VeraScene *scene = [[VeraScene alloc] initWithDictionary:dictionary];
-                scene.controllerUrl = [self controlUrl];
-                self.scenes = [self.scenes arrayByAddingObject:scene];
-                
-                VeraRoom *room = [self.roomsDictionary objectForKey:scene.room];
-                NSAssert((room != nil), @"Room does not exist - %@", scene.room);
-                NSArray *array = [room.scenes filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"sceneNum == %@", scene.sceneNum]];
-                if (array.count == 0){
-                    //Scene not found, add it
-                    //TODO: deal with device removals
-                    room.scenes = [room.scenes arrayByAddingObject:scene];
-                }
-            }
-            
-            dispatch_async(dispatch_get_main_queue(), ^(){
-                [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
-            });
+            return;
         }
+        
+        NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+        
+        if (error != nil) {
+            //There was an error processing JSON, this happens if username/password is invalid
+            [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:[NSError errorWithDomain:@"VeraControl - Error refreshing devices" code:50 userInfo:error.userInfo]];
+            return;
+        }
+        
+        //Gather the rooms
+        NSArray *parsedRooms = responseDictionary[@"rooms"];
+        
+        if (self.roomsDictionary == nil) {
+            self.roomsDictionary = [[NSMutableDictionary alloc] initWithCapacity:(parsedRooms.count+1)];
+            
+            VeraRoom *unassignedRoom = [[VeraRoom alloc] init];
+            unassignedRoom.name = @"Unassigned";
+            unassignedRoom.identifier = @"0";
+            unassignedRoom.section = @"0";
+            
+            [self.roomsDictionary setObject:unassignedRoom forKey:unassignedRoom.identifier];
+        }
+        
+        //Add the unassigned room
+        self.rooms = @[[self.roomsDictionary objectForKey:@"0"]];
+        
+        for (NSDictionary *parsedRoom in parsedRooms){
+            //Check to see if the room exists and update it, if not create one
+            NSString *identifier = [[parsedRoom objectForKey:@"id"] stringValue];
+            VeraRoom *room = self.roomsDictionary[identifier];
+            
+            if (room == nil) {
+                VeraRoom *room = [[VeraRoom alloc] init];
+                room.name = [parsedRoom objectForKey:@"name"];
+                room.identifier = [[parsedRoom objectForKey:@"id"] stringValue];
+                room.section = [parsedRoom objectForKey:@"section"];
+                self.rooms = [self.rooms arrayByAddingObject:room];
+                [self.roomsDictionary setObject:room forKey:room.identifier];
+            }
+            else {
+                room.name = [parsedRoom objectForKey:@"name"];
+                room.identifier = [[parsedRoom objectForKey:@"id"] stringValue];
+                room.section = [parsedRoom objectForKey:@"section"];
+                
+                //Clear the devices since we are going to refill it
+                //TODO: We should create a devices dictionary as well
+                room.devices = @[];
+            }
+        }
+        
+        //Gather the devices
+        NSArray *devices = responseDictionary[@"devices"];
+        
+        if (self.deviceDictionary == nil) {
+            self.deviceDictionary = [[NSMutableDictionary alloc] initWithCapacity:devices.count];
+        }
+        
+        for (NSDictionary *deviceData in devices){
+            NSString *deviceType = deviceData[@"device_type"];
+            NSString *deviceIdentifier = deviceData[@"id"];
+            
+            ZwaveNode *device = self.deviceDictionary[deviceIdentifier];
+            
+            if (device == nil) {
+                //Create a new ZWaveNode based on deviceType
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DIMMABLE_SWITCH]){
+                    device = [[ZwaveDimmerSwitch alloc] initWithDictionary:deviceData];
+                    self.dimmerSwitches = [self.dimmerSwitches arrayByAddingObject:device];
+                }
+                
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_SWITCH]){
+                    device = [[ZwaveSwitch alloc] initWithDictionary:deviceData];
+                    self.switches = [self.switches arrayByAddingObject:device];
+                }
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_DOOR_LOCK]){
+                    device = [[ZwaveLock alloc] initWithDictionary:deviceData];
+                    self.locks = [self.locks arrayByAddingObject:device];
+                }
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_THERMOSTAT]){
+                    device = [[ZwaveThermostat alloc] initWithDictionary:deviceData];
+                    self.thermostats = [self.thermostats arrayByAddingObject:device];
+                }
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_NEST_THERMOSTAT]){
+                    device = [[ZwaveThermostat alloc] initWithDictionary:deviceData];
+                    self.thermostats = [self.thermostats arrayByAddingObject:device];
+                }
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_MOTION_SENSOR]){
+                    device = [[ZwaveSecuritySensor alloc] initWithDictionary:deviceData];
+                    self.securitySensors = [self.securitySensors arrayByAddingObject:device];
+                }
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_PHILLIPS_HUE_BULB]){
+                    device = [[PhillipsHueBulb alloc] initWithDictionary:deviceData];
+                    self.hueBulbs = [self.hueBulbs arrayByAddingObject:device];
+                }
+                
+                if ([deviceType isEqualToString:UPNP_DEVICE_TYPE_IP_CAMERA]){
+                    device = [[IPCamera alloc] initWithDictionary:deviceData];
+                    self.ipCameras = [self.ipCameras arrayByAddingObject:device];
+                }
+                
+                if (device)
+                    [self.deviceDictionary setObject:device forKey:deviceIdentifier];
+            }
+            
+            else {
+                //Update the device
+                [device updateWithDictionary:deviceData];
+            }
+            
+            //Add the device to the room
+            if (device){
+                device.controllerUrl = [self controlUrl];
+                VeraRoom *room = [self.roomsDictionary objectForKey:device.room];
+                NSAssert((room != nil), @"Room does not exist - %@", device.room);
+                
+                //Scan the array to see if the device is already added to the room
+                //TODO: This might make sense being a dictionary as well. Also need to deal with device being removed from a room.
+                NSArray *array = [room.devices filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", device.identifier]];
+                if (array.count == 0){
+                    //Device not found, add it
+                    room.devices = [room.devices arrayByAddingObject:device];
+                }
+
+            }
+        }
+        
+        
+        //Get Scenes
+        self.scenes = @[];
+        
+        //Clear all the room scenes
+        //TODO: Make scenes an updateable dictionary like rooms and devices
+        for (id roomid in self.roomsDictionary) {
+            VeraRoom *room = [self.roomsDictionary objectForKey:roomid];
+            room.scenes = @[];
+        }
+        
+        NSArray *scenes = responseDictionary[@"scenes"];
+        for (NSDictionary *dictionary in scenes){
+            VeraScene *scene = [[VeraScene alloc] initWithDictionary:dictionary];
+            scene.controllerUrl = [self controlUrl];
+            self.scenes = [self.scenes arrayByAddingObject:scene];
+            
+            VeraRoom *room = [self.roomsDictionary objectForKey:scene.room];
+            NSAssert((room != nil), @"Room does not exist - %@", scene.room);
+            NSArray *array = [room.scenes filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"sceneNum == %@", scene.sceneNum]];
+            if (array.count == 0){
+                //Scene not found, add it
+                //TODO: deal with device removals
+                room.scenes = [room.scenes arrayByAddingObject:scene];
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^(){
+            [[NSNotificationCenter defaultCenter] postNotificationName:VERA_DEVICES_DID_REFRESH_NOTIFICATION object:nil];
+        });
+        
     }];
 }
 
@@ -297,4 +345,21 @@ static VeraController *sharedInstance;
     scene.schedules = @[];
     return scene;
 }
+
+
+#define NSCoding
+
+-(NSArray*)propertiesToCode{
+    
+     //@"miosUsername",@"miosPassword", @"ipAddress", @"veraSerialNumber", @"useMiosRemoteService",@"miosHostname"
+    
+    
+    return @[];
+}
+
+
+
+
+
+
 @end

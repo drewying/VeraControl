@@ -26,9 +26,6 @@
 
 @interface VeraController : NSObject
 
-//Singleton instance of the controller
-+(id)sharedController;
-
 //Must be defined for remote access or auto Vera discovery
 @property (nonatomic, strong) NSString *miosUsername;
 @property (nonatomic, strong) NSString *miosPassword;
@@ -55,7 +52,10 @@
 @property (nonatomic, strong) NSString *miosHostname;
 
 //Discovery
--(void)findVeraController;
++(void)findVeraControllers:(NSString*)miosUsername password:(NSString*)miosPassword completion:(void(^)(NSArray *units, NSError *error))completionBlock;
+
+//Reachability
+-(void)testReachability:(void(^)(BOOL reachable))completion;
 
 //The refreshDevice commands polls the device and builds a list of all devices.
 -(void)refreshDevices;
