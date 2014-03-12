@@ -14,26 +14,23 @@ The main class is the VeraController. You can look at the VeraController.h for a
 
 Discovery:
 ```
-VeraController *veraController = [VeraController sharedInstance];
-veraController.username = @"MyMiosUsername";
-veraController.password = @"MyMiosPassword";
-[veraController findVeraController]; //This automaticallly determines whether the controller is local or remote.
-[veraController refreshDevices] //This populates all the device arrays, rooms, and scenes, sending out a NSNotification when complete.
+[VeraController findVeraControllers:miosUsername password:miosPassword completion:^(NSArray *units, NSError *error){
+   VeraController *veraController = [units firstObject];
+  [veraController refreshDevices]; //This  populates all the device arrays, rooms, and scenes, sending out a NSNotification when complete.
+}
 ```
 
 Turn on a lightswitch:
 ```
-ZwaveSwitch *bedroomSwitch = [veraController.switches objectAtIndex:0];
+ZwaveSwitch *bedroomSwitch = [veraController.switches firstObject];
 [bedroomSwitch setOn:YES completion:^(){
   NSLog(@"Bedroom Light turned on");
 }];
 ```
 TODO:
 
-Seperate VeraController into multiple sub-controller classes
-
-Scenes.
-
-Response returned in callback block
-
 Unidentified device support.
+
+UI6 authentication support
+
+Better scene creation support
