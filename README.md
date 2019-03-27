@@ -29,8 +29,10 @@ ZwaveSwitch *bedroomSwitch = [veraController.switches firstObject];
 ```
 TODO:
 
-Unidentified device support.
+- Unidentified device support.
 
-UI6 authentication support
+- UI6 authentication support
 
-Better scene creation support
+- Better scene creation support
+
+# This project is dead and no further contributions are expected.
